@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
@@ -13,6 +13,8 @@ import Input from "@/components/ui/Input";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/feed";
   const setAuth = useAuthStore((s) => s.setAuth);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,7 +42,7 @@ export default function LoginPage() {
       }
 
       setAuth({ isLoggedIn: true });
-      router.push("/feed");
+      router.push(callbackUrl);
     } catch {
       toast("네트워크 오류가 발생했습니다.");
     } finally {
