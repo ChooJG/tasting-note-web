@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/session";
+import { getSession, parseJwtPayload } from "@/lib/session";
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
@@ -24,6 +24,11 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   session.accessToken = data.data.accessToken;
   session.refreshToken = data.data.refreshToken;
+
+  const jwt = parseJwtPayload(data.data.accessToken);
+  if (jwt.sub) session.userId = Number(jwt.sub);
+  if (jwt.nickname) session.nickname = String(jwt.nickname);
+
   await session.save();
 
   return NextResponse.json({ success: true });

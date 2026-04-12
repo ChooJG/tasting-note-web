@@ -27,7 +27,7 @@ export default function NoteDetailPage({
   const { id } = use(params);
   const noteId = Number(id);
   const router = useRouter();
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const { isLoggedIn, userId } = useAuthStore();
 
   const { data: note, isLoading } = useNote(noteId);
   const deleteMutation = useDeleteNote();
@@ -54,6 +54,7 @@ export default function NoteDetailPage({
   }
 
   const isDraft = note.status === "DRAFT";
+  const isOwner = isLoggedIn && userId != null && note.userId === userId;
   const stars = Array.from({ length: 5 }, (_, i) => i < (note.rating ?? 0));
 
   return (
@@ -191,8 +192,8 @@ export default function NoteDetailPage({
         )}
       </div>
 
-      {/* Actions */}
-      {isLoggedIn && (
+      {/* Actions — 본인 노트에만 표시 */}
+      {isOwner && (
         <div className="shrink-0 flex gap-2.5 px-5 pb-6">
           <Button
             variant="secondary"
@@ -215,36 +216,42 @@ export default function NoteDetailPage({
         title="노트 옵션"
       >
         <div className="flex flex-col gap-1">
-          <button
-            onClick={() => {
-              setOptionsOpen(false);
-              router.push(`/notes/${noteId}/edit`);
-            }}
-            className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
-          >
-            <span className="text-[18px]">✏️</span>
-            <span className="text-[15px] text-ink">수정하기</span>
-          </button>
-          <button
-            onClick={() => {
-              setOptionsOpen(false);
-              setReportOpen(true);
-            }}
-            className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
-          >
-            <span className="text-[18px]">🚩</span>
-            <span className="text-[15px] text-ink">신고하기</span>
-          </button>
-          <button
-            onClick={() => {
-              setOptionsOpen(false);
-              deleteMutation.mutate(noteId);
-            }}
-            className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
-          >
-            <span className="text-[18px]">🗑️</span>
-            <span className="text-[15px] text-[#C0392B]">삭제하기</span>
-          </button>
+          {isOwner && (
+            <button
+              onClick={() => {
+                setOptionsOpen(false);
+                router.push(`/notes/${noteId}/edit`);
+              }}
+              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
+            >
+              <span className="text-[18px]">✏️</span>
+              <span className="text-[15px] text-ink">수정하기</span>
+            </button>
+          )}
+          {!isOwner && (
+            <button
+              onClick={() => {
+                setOptionsOpen(false);
+                setReportOpen(true);
+              }}
+              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
+            >
+              <span className="text-[18px]">🚩</span>
+              <span className="text-[15px] text-ink">신고하기</span>
+            </button>
+          )}
+          {isOwner && (
+            <button
+              onClick={() => {
+                setOptionsOpen(false);
+                deleteMutation.mutate(noteId);
+              }}
+              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
+            >
+              <span className="text-[18px]">🗑️</span>
+              <span className="text-[15px] text-[#C0392B]">삭제하기</span>
+            </button>
+          )}
         </div>
         <div className="mt-3">
           <Button variant="secondary" onClick={() => setOptionsOpen(false)}>

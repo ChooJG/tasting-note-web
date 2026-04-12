@@ -4,7 +4,17 @@ import { cookies } from "next/headers";
 export interface SessionData {
   accessToken: string;
   refreshToken: string;
+  userId?: number;
   nickname?: string;
+}
+
+export function parseJwtPayload(token: string): Record<string, unknown> {
+  try {
+    const payload = token.split(".")[1];
+    return JSON.parse(Buffer.from(payload, "base64url").toString());
+  } catch {
+    return {};
+  }
 }
 
 const sessionOptions: SessionOptions = {
