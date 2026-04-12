@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Tasting Note",
@@ -21,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased">
       <body className="min-h-full bg-beige">
-        <div className="mx-auto min-h-dvh max-w-[430px] bg-beige">
-          {children}
-        </div>
+        <Providers>
+          <div className="mx-auto min-h-dvh max-w-[430px] bg-beige">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
