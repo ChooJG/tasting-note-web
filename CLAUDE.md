@@ -58,7 +58,7 @@ src/
 
 - **Base URL**: `http://13.124.79.235:8080`
 - **Swagger**: `http://13.124.79.235:8080/swagger-ui/ㄴ.html`
-- **API Docs JSON**: `http://13.124.79.235:8080/v3/api-docs`
+- **API Docs JSON**: `http://13.124.79.235:8080/api-docs`
 - **인증 방식**: Bearer JWT (Access Token + Refresh Token)
 
 ## API 엔드포인트 요약

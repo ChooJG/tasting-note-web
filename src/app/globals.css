@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "pretendard/dist/web/variable/pretendardvariable.css";
+
+@theme inline {
+  /* Background */
+  --color-beige: #F0EAE0;
+  --color-beige-mid: #E8E0D4;
+  --color-beige-dark: #D9CFBF;
+
+  /* Point */
+  --color-wine: #7B2D2D;
+  --color-wine-light: #8F3535;
+  --color-wine-pale: #F9F0EE;
+
+  /* Text */
+  --color-ink: #1E1208;
+  --color-ink-soft: #5C4020;
+  --color-ink-muted: #9A8060;
+
+  /* Semantic */
+  --color-success: #27AE60;
+  --color-rating: #D4941A;
+
+  /* Border Radius */
+  --radius-card: 14px;
+  --radius-input: 8px;
+  --radius-pill: 20px;
+  --radius-device: 48px;
+
+  /* Font */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  background: var(--color-beige);
+  color: var(--color-ink);
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-toastIn {
+  animation: toastIn 0.25s ease;
+}

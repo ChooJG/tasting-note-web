@@ -1,0 +1,30 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Tasting Note",
+  description: "나만의 술 테이스팅 경험을 기록하고 공유하세요",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ko" className="h-full antialiased">
+      <body className="min-h-full bg-beige">
+        <div className="mx-auto min-h-dvh max-w-[430px] bg-beige">
+          {children}
+        </div>
+      </body>
+    </html>
+  );
+}
