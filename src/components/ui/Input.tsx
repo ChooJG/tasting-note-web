@@ -12,7 +12,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label className="text-[13px] font-medium text-ink-soft">
+          <label className="text-[12px] font-medium uppercase tracking-[0.06em] text-ink-soft">
             {label}
           </label>
         )}
