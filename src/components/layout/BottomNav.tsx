@@ -44,7 +44,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-beige-dark bg-beige pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-beige-dark bg-beige pb-[env(safe-area-inset-bottom)] sm:max-w-[500px] md:max-w-[560px] lg:max-w-[600px]">
       <div className="flex h-[68px] items-center justify-around px-2">
         {navItems.map((item, i) => {
           if (!item) {
