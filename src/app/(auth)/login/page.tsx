@@ -15,47 +15,75 @@ export default function LoginPage() {
   } = form;
 
   return (
-    <div className="w-full">
-      <SipLogo />
-      <h1 className="mt-10 text-[28px] font-medium tracking-[-0.03em] text-ink">
-        다시 만나요
-      </h1>
-      <p className="mt-1 text-[14px] text-ink-muted">
-        테이스팅 노트를 이어서 작성해보세요
-      </p>
-
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 flex flex-col gap-4"
-      >
-        <Input
-          label="이메일"
-          type="email"
-          placeholder="hello@example.com"
-          autoComplete="email"
-          {...register("email")}
-          error={errors.email?.message}
+    <div className="flex min-h-dvh flex-col">
+      {/* Wine hero */}
+      <section className="relative shrink-0 overflow-hidden bg-wine px-6 pb-12 pt-14">
+        {/* Decorative circles */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-28 -top-24 h-[360px] w-[360px] rounded-full border border-beige/[0.08]"
         />
-        <Input
-          label="비밀번호"
-          type="password"
-          placeholder="••••••••"
-          autoComplete="current-password"
-          {...register("password")}
-          error={errors.password?.message}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-20 -left-20 h-[240px] w-[240px] rounded-full border border-beige/[0.06]"
         />
 
-        <Button type="submit" disabled={isLoading} className="mt-6">
-          {isLoading ? "로그인 중..." : "로그인"}
-        </Button>
-      </form>
+        <div className="relative">
+          <div className="mb-10">
+            <SipLogo variant="light" size={36} />
+          </div>
 
-      <p className="mt-5 text-center text-[13px] text-ink-muted">
-        아직 계정이 없으신가요?{" "}
-        <Link href="/signup" className="font-medium text-wine">
-          회원가입
-        </Link>
-      </p>
+          <h2 className="text-[28px] font-normal leading-[1.3] tracking-[-0.02em] text-beige/95">
+            마신 순간을
+            <br />
+            기록하는
+            <br />
+            <span className="font-light text-beige/60">나만의 노트</span>
+          </h2>
+        </div>
+      </section>
+
+      {/* Form */}
+      <section className="flex flex-1 flex-col px-6 pb-10 pt-10">
+        <div className="mb-8">
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-wine">
+            환영합니다
+          </p>
+          <h1 className="text-[28px] font-medium tracking-[-0.03em] text-ink">
+            로그인
+          </h1>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+          <Input
+            label="이메일"
+            type="email"
+            placeholder="hello@example.com"
+            autoComplete="email"
+            {...register("email")}
+            error={errors.email?.message}
+          />
+          <Input
+            label="비밀번호"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            {...register("password")}
+            error={errors.password?.message}
+          />
+
+          <Button type="submit" disabled={isLoading} className="mt-4">
+            {isLoading ? "로그인 중..." : "로그인"}
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-[13px] text-ink-muted">
+          아직 계정이 없으신가요?{" "}
+          <Link href="/signup" className="font-medium text-wine">
+            회원가입
+          </Link>
+        </p>
+      </section>
     </div>
   );
 }

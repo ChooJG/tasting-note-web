@@ -1,9 +1,17 @@
 interface SipLogoProps {
   showText?: boolean;
   size?: number;
+  variant?: "dark" | "light";
 }
 
-export default function SipLogo({ showText = true, size = 32 }: SipLogoProps) {
+export default function SipLogo({
+  showText = true,
+  size = 32,
+  variant = "dark",
+}: SipLogoProps) {
+  const stroke = variant === "dark" ? "#7B2D2D" : "#F0EAE0";
+  const textClass = variant === "dark" ? "text-wine" : "text-beige";
+
   return (
     <div className="flex items-center gap-2.5">
       <svg
@@ -15,25 +23,27 @@ export default function SipLogo({ showText = true, size = 32 }: SipLogoProps) {
       >
         <path
           d="M18 4C18 4 8 15 8 23C8 28.5228 12.4772 33 18 33C23.5228 33 28 28.5228 28 23C28 15 18 4"
-          stroke="#7B2D2D"
+          stroke={stroke}
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <path
           d="M14 26C14 26 16 28 18 28C20 28 22 26 22 26"
-          stroke="#7B2D2D"
+          stroke={stroke}
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <path
           d="M14 22V20M22 22V20"
-          stroke="#7B2D2D"
+          stroke={stroke}
           strokeWidth="2.5"
           strokeLinecap="round"
         />
       </svg>
       {showText && (
-        <span className="text-[24px] font-semibold tracking-[0.04em] text-wine">
+        <span
+          className={`text-[24px] font-semibold tracking-[0.04em] ${textClass}`}
+        >
           sip
         </span>
       )}

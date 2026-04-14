@@ -16,7 +16,7 @@ export default function SignupPage() {
   } = form;
 
   return (
-    <div className="w-full">
+    <div className="flex min-h-dvh flex-col px-6 pb-10 pt-10">
       <button
         onClick={() => router.back()}
         className="mb-6 flex h-9 w-9 items-center justify-center rounded-full bg-white/70"
@@ -35,6 +35,9 @@ export default function SignupPage() {
         </svg>
       </button>
 
+      <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-wine">
+        환영합니다
+      </p>
       <h1 className="text-[28px] font-medium tracking-[-0.03em] text-ink">
         계정 만들기
       </h1>
