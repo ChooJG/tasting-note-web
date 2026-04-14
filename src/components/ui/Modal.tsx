@@ -34,7 +34,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     >
       <div className="flex h-full items-end justify-center">
         <div
-          className={`w-full max-w-[430px] rounded-t-[24px] bg-beige px-5 pb-8 transition-transform duration-250 sm:max-w-[465px] md:max-w-[495px] lg:max-w-[515px] ${open ? "animate-slideUp" : ""}`}
+          className={`w-full max-w-[430px] rounded-t-[24px] bg-beige px-5 pb-8 transition-transform duration-250 sm:max-w-[450px] md:max-w-[475px] lg:max-w-[490px] ${open ? "animate-slideUp" : ""}`}
         >
           <div className="flex justify-center py-3">
             <div className="h-1 w-9 rounded-full bg-beige-dark" />

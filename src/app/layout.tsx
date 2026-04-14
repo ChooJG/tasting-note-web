@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="ko" className="h-full antialiased">
       <body className="min-h-full bg-beige-mid">
         <Providers>
-          <div className="mx-auto min-h-dvh max-w-[430px] bg-beige shadow-[0_0_40px_rgba(30,18,8,0.18)] sm:max-w-[465px] md:max-w-[495px] lg:max-w-[515px]">
+          <div className="mx-auto min-h-dvh max-w-[430px] bg-beige shadow-[0_0_40px_rgba(30,18,8,0.18)] sm:max-w-[450px] md:max-w-[475px] lg:max-w-[490px]">
             {children}
           </div>
         </Providers>
