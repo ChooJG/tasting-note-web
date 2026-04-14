@@ -8,35 +8,29 @@ export default function NotFound() {
         <div className="absolute -inset-6 rounded-full bg-wine/5" />
         <div className="absolute -inset-3 rounded-full bg-wine/8" />
         <svg
-          viewBox="0 0 64 64"
+          viewBox="0 0 36 36"
           fill="none"
           className="relative h-20 w-20"
         >
           <path
-            d="M32 6C32 6 14 24 14 38C14 47.94 22.06 56 32 56C41.94 56 50 47.94 50 38C50 24 32 6 32 6Z"
-            fill="rgba(123,45,45,0.1)"
+            d="M18 4C18 4 8 15 8 23C8 28.5228 12.4772 33 18 33C23.5228 33 28 28.5228 28 23C28 15 18 4"
             stroke="#7B2D2D"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+          {/* Sad mouth */}
+          <path
+            d="M14 28C14 28 16 26 18 26C20 26 22 28 22 28"
+            stroke="#7B2D2D"
+            strokeWidth="2.5"
+            strokeLinecap="round"
           />
           <path
-            d="M32 24C32 24 22 35 22 42C22 47.52 26.48 52 32 52"
+            d="M14 22V20M22 22V20"
             stroke="#7B2D2D"
-            strokeWidth="1"
+            strokeWidth="2.5"
             strokeLinecap="round"
-            opacity="0.3"
           />
-          {/* Question mark */}
-          <text
-            x="32"
-            y="40"
-            textAnchor="middle"
-            fill="#7B2D2D"
-            fontSize="18"
-            fontWeight="600"
-            fontFamily="Pretendard Variable, sans-serif"
-          >
-            ?
-          </text>
         </svg>
       </div>
 

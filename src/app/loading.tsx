@@ -6,15 +6,27 @@ export default function Loading() {
           <div className="absolute inset-0 animate-ping rounded-full bg-wine/20" />
           <div className="absolute inset-1 animate-pulse rounded-full bg-wine/40" />
           <svg
-            viewBox="0 0 32 32"
+            viewBox="0 0 36 36"
             fill="none"
             className="absolute inset-0 h-10 w-10"
           >
             <path
-              d="M16 3C16 3 7 12 7 19C7 23.97 11.03 28 16 28C20.97 28 25 23.97 25 19C25 12 16 3 16 3Z"
-              fill="rgba(123,45,45,0.15)"
+              d="M18 4C18 4 8 15 8 23C8 28.5228 12.4772 33 18 33C23.5228 33 28 28.5228 28 23C28 15 18 4"
               stroke="#7B2D2D"
-              strokeWidth="1.2"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M14 26C14 26 16 28 18 28C20 28 22 26 22 26"
+              stroke="#7B2D2D"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M14 22V20M22 22V20"
+              stroke="#7B2D2D"
+              strokeWidth="2.5"
+              strokeLinecap="round"
             />
           </svg>
         </div>

@@ -1,24 +1,42 @@
-export default function SipLogo() {
+interface SipLogoProps {
+  showText?: boolean;
+  size?: number;
+}
+
+export default function SipLogo({ showText = true, size = 32 }: SipLogoProps) {
   return (
     <div className="flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 36 36"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <path
-          d="M16 3C16 3 7 12 7 19C7 23.97 11.03 28 16 28C20.97 28 25 23.97 25 19C25 12 16 3 16 3Z"
-          fill="rgba(123,45,45,0.15)"
+          d="M18 4C18 4 8 15 8 23C8 28.5228 12.4772 33 18 33C23.5228 33 28 28.5228 28 23C28 15 18 4"
           stroke="#7B2D2D"
-          strokeWidth="1.2"
+          strokeWidth="2.5"
+          strokeLinecap="round"
         />
         <path
-          d="M16 12C16 12 11 17.5 11 21C11 23.76 13.24 26 16 26"
+          d="M14 26C14 26 16 28 18 28C20 28 22 26 22 26"
           stroke="#7B2D2D"
-          strokeWidth="1"
+          strokeWidth="2.5"
           strokeLinecap="round"
-          opacity="0.5"
+        />
+        <path
+          d="M14 22V20M22 22V20"
+          stroke="#7B2D2D"
+          strokeWidth="2.5"
+          strokeLinecap="round"
         />
       </svg>
-      <span className="text-[24px] font-semibold tracking-[0.04em] text-wine">
-        sip
-      </span>
+      {showText && (
+        <span className="text-[24px] font-semibold tracking-[0.04em] text-wine">
+          sip
+        </span>
+      )}
     </div>
   );
 }
