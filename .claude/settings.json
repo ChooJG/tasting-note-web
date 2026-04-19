@@ -2,10 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(kill 14852)",
-      "Bash(kill 96910)"
+      "Bash(kill 96910)",
+      "Bash(curl -s -X POST https://myfirstsbproject.shop/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"test1234\"}')",
+      "WebSearch",
+      "WebFetch(domain:lottiefiles.com)"
     ],
     "additionalDirectories": [
-      "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]"
+      "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]",
+      "/Users/choo/VisualProjects/sip-app/src/app/api/notes/[noteId]"
     ]
   }
 }

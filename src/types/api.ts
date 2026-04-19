@@ -125,6 +125,16 @@ export interface components {
       alias?: string;
       reason?: string;
     };
+    ProfileImageResponse: {
+      profileImageUrl?: string;
+    };
+    UpdatePasswordRequest: {
+      currentPassword: string;
+      newPassword: string;
+    };
+    UpdateNicknameRequest: {
+      nickname: string;
+    };
     AlcoholRequestResponse: {
       /** Format: int64 */
       id?: number;

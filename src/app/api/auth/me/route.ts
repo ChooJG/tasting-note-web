@@ -12,5 +12,6 @@ export async function GET() {
     isLoggedIn: true,
     userId: session.userId ?? null,
     nickname: session.nickname ?? null,
+    profileImageUrl: session.profileImageUrl ?? null,
   });
 }

@@ -8,26 +8,32 @@ type AlcoholResponse = components["schemas"]["AlcoholResponse"];
 type AlcoholCategory = NonNullable<AlcoholResponse["category"]>;
 
 const CATEGORIES: { label: string; value: AlcoholCategory }[] = [
-  { label: "🥃 위스키", value: "WHISKEY" },
-  { label: "🍷 와인", value: "WINE" },
-  { label: "🍺 맥주", value: "BEER" },
-  { label: "🍶 사케", value: "SAKE" },
-  { label: "🌾 막걸리", value: "MAKGEOLLI" },
-  { label: "🫙 소주", value: "SOJU" },
-  { label: "🍸 진", value: "GIN" },
-  { label: "🥂 칵테일", value: "COCKTAIL" },
-  { label: "🍾 브랜디", value: "BRANDY" },
-  { label: "기타", value: "ETC" },
+  { label: "\u{1F943} \uC704\uC2A4\uD0A4", value: "WHISKEY" },
+  { label: "\u{1F377} \uC640\uC778", value: "WINE" },
+  { label: "\u{1F37A} \uB9E5\uC8FC", value: "BEER" },
+  { label: "\u{1F376} \uC0AC\uCF00", value: "SAKE" },
+  { label: "\u{1F33E} \uB9C9\uAC78\uB9AC", value: "MAKGEOLLI" },
+  { label: "\u{1FAD9} \uC18C\uC8FC", value: "SOJU" },
+  { label: "\u{1F378} \uC9C4", value: "GIN" },
+  { label: "\u{1F942} \uCE35\uD14C\uC77C", value: "COCKTAIL" },
+  { label: "\u{1F37E} \uBE0C\uB79C\uB514", value: "BRANDY" },
+  { label: "\uAE30\uD0C0", value: "ETC" },
 ];
 
 const CATEGORY_ICONS: Record<string, string> = {
-  WHISKEY: "🥃", WINE: "🍷", BEER: "🍺", SAKE: "🍶",
-  MAKGEOLLI: "🌾", SOJU: "🫙", GIN: "🍸", RUM: "🍹",
-  VODKA: "🫗", TEQUILA: "🌵", BRANDY: "🍾", COCKTAIL: "🥂", ETC: "🍷",
+  WHISKEY: "\u{1F943}", WINE: "\u{1F377}", BEER: "\u{1F37A}", SAKE: "\u{1F376}",
+  MAKGEOLLI: "\u{1F33E}", SOJU: "\u{1FAD9}", GIN: "\u{1F378}", RUM: "\u{1F3F9}",
+  VODKA: "\u{1FAD7}", TEQUILA: "\u{1F335}", BRANDY: "\u{1F37E}", COCKTAIL: "\u{1F942}", ETC: "\u{1F377}",
 };
 
+export interface AlcoholSelection {
+  type: "search" | "custom";
+  alcohol?: AlcoholResponse;
+  customName?: string;
+}
+
 interface AlcoholSearchProps {
-  onSelect: (alcohol: AlcoholResponse) => void;
+  onSelect: (selection: AlcoholSelection) => void;
   onBack: () => void;
 }
 
@@ -49,6 +55,7 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
   const isSearching = debouncedKeyword.length >= 1;
   const alcohols = isSearching ? searchQuery.data : categoryQuery.data;
   const isLoading = isSearching ? searchQuery.isLoading : categoryQuery.isLoading;
+  const noResults = isSearching && !isLoading && alcohols && alcohols.length === 0;
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -115,7 +122,7 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
         {alcohols?.map((alc) => (
           <button
             key={alc.id}
-            onClick={() => onSelect(alc)}
+            onClick={() => onSelect({ type: "search", alcohol: alc })}
             className="flex w-full items-center gap-3.5 px-5 py-3.5 text-left active:bg-beige-mid/50"
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-beige-mid text-[20px]">
@@ -125,7 +132,7 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
               <p className="text-[15px] font-medium text-ink">{alc.name}</p>
               <p className="mt-0.5 text-[12px] text-ink-muted">
                 {alc.nameKo ?? ""}
-                {alc.nameKo && alc.categoryKo ? " · " : ""}
+                {alc.nameKo && alc.categoryKo ? " \xB7 " : ""}
                 {alc.categoryKo ?? ""}
               </p>
             </div>
@@ -134,9 +141,30 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
             </span>
           </button>
         ))}
-        {alcohols && alcohols.length === 0 && (
+
+        {/* 직접 입력 옵션 — 검색어가 있을 때 항상 표시 */}
+        {isSearching && !isLoading && (
+          <button
+            onClick={() => onSelect({ type: "custom", customName: keyword.trim() })}
+            className="flex w-full items-center gap-3.5 border-t border-beige-mid px-5 py-4 text-left active:bg-beige-mid/50"
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-dashed border-wine/40 text-[18px]">
+              ✏️
+            </div>
+            <div className="flex-1">
+              <p className="text-[15px] font-medium text-wine">
+                &quot;{keyword.trim()}&quot; 직접 입력
+              </p>
+              <p className="mt-0.5 text-[12px] text-ink-muted">
+                목록에 없는 술을 직접 이름으로 기록합니다
+              </p>
+            </div>
+          </button>
+        )}
+
+        {!isSearching && alcohols && alcohols.length === 0 && (
           <div className="py-16 text-center text-[14px] text-ink-muted">
-            결과가 없습니다
+            카테고리를 선택하세요
           </div>
         )}
       </div>

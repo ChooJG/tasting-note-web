@@ -7,6 +7,7 @@ import { useUpdateNote } from "@/hooks/useUpdateNote";
 import { usePublishNote } from "@/hooks/useNoteMutations";
 import NoteForm from "@/components/notes/NoteForm";
 import AlcoholSearch from "@/components/notes/AlcoholSearch";
+import type { AlcoholSelection } from "@/components/notes/AlcoholSearch";
 import Button from "@/components/ui/Button";
 import type { components } from "@/types/api";
 import type { NoteFormInput } from "@/lib/validations/note";
@@ -27,7 +28,8 @@ export default function EditNotePage({
   const publishNote = usePublishNote();
 
   const [pickingAlcohol, setPickingAlcohol] = useState(false);
-  const [alcohol, setAlcohol] = useState<AlcoholResponse | null>(null);
+  const [selectedAlcohol, setSelectedAlcohol] = useState<AlcoholResponse | null>(null);
+  const [customAlcoholName, setCustomAlcoholName] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -45,37 +47,53 @@ export default function EditNotePage({
     );
   }
 
-  const currentAlcohol: AlcoholResponse = alcohol ?? {
-    id: note.alcoholId,
-    name: note.alcoholName,
-    nameKo: note.alcoholNameKo,
-  };
+  // 초기값: 기존 노트 데이터에서 가져옴
+  const effectiveAlcohol: AlcoholResponse | null = selectedAlcohol ?? (
+    note.alcoholId ? { id: note.alcoholId, name: note.alcoholName, nameKo: note.alcoholNameKo } : null
+  );
+  const effectiveCustomName = customAlcoholName ?? note.customAlcoholName ?? "";
 
-  const handleSubmit = (data: NoteFormInput) => {
-    updateNote.mutate({
-      alcoholId: data.alcoholId,
-      customAlcoholName: data.customAlcoholName,
-      title: data.title || undefined,
-      rating: data.rating,
-      taste: data.taste || undefined,
-      aroma: data.aroma || undefined,
-      pairing: data.pairing || undefined,
-      description: data.description || undefined,
-      drankAt: data.drankAt || undefined,
-      location: data.location || undefined,
-      isPublic: data.isPublic ?? false,
-    });
-  };
-
-  const handlePublish = () => {
-    publishNote.mutate(noteId);
+  const handleSubmit = (data: NoteFormInput, photos: File[]) => {
+    updateNote.mutate(
+      {
+        alcoholId: effectiveAlcohol?.id ?? undefined,
+        customAlcoholName: effectiveAlcohol ? undefined : (effectiveCustomName || undefined),
+        title: data.title || undefined,
+        rating: data.rating,
+        taste: data.taste || undefined,
+        aroma: data.aroma || undefined,
+        pairing: data.pairing || undefined,
+        description: data.description || undefined,
+        drankAt: data.drankAt || undefined,
+        location: data.location || undefined,
+        isPublic: data.isPublic ?? false,
+      },
+      {
+        onSuccess: async () => {
+          if (photos.length > 0) {
+            const formData = new FormData();
+            photos.forEach((file) => formData.append("images", file));
+            await fetch(`/api/notes/${noteId}/images`, {
+              method: "PUT",
+              body: formData,
+            });
+          }
+        },
+      }
+    );
   };
 
   if (pickingAlcohol) {
     return (
       <AlcoholSearch
-        onSelect={(alc) => {
-          setAlcohol(alc);
+        onSelect={(selection: AlcoholSelection) => {
+          if (selection.type === "search" && selection.alcohol) {
+            setSelectedAlcohol(selection.alcohol);
+            setCustomAlcoholName("");
+          } else if (selection.type === "custom" && selection.customName) {
+            setSelectedAlcohol(null);
+            setCustomAlcoholName(selection.customName);
+          }
           setPickingAlcohol(false);
         }}
         onBack={() => setPickingAlcohol(false)}
@@ -87,27 +105,34 @@ export default function EditNotePage({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* Header */}
-      <header className="flex shrink-0 items-center px-5 pb-3 pt-4">
+      <header className="flex shrink-0 items-center border-b border-beige-dark px-5 pb-3 pt-4">
         <button
           onClick={() => router.back()}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70"
+          className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/70"
         >
-          <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M11 4L6 9L11 14" />
+          <svg width={14} height={14} viewBox="0 0 14 14" fill="none">
+            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" />
           </svg>
         </button>
-        <span className="flex-1 text-center text-[17px] font-semibold text-ink">
+        <span className="flex-1 text-center text-[16px] font-semibold text-ink">
           노트 수정
         </span>
-        <div className="w-9" />
+        <div className="w-[34px]" />
       </header>
 
-      {/* Form */}
       <div className="flex-1 overflow-y-auto">
         <NoteForm
-          alcohol={currentAlcohol}
-          onChangeAlcohol={() => setPickingAlcohol(true)}
+          selectedAlcohol={effectiveAlcohol}
+          customAlcoholName={effectiveCustomName}
+          onCustomAlcoholNameChange={(name) => {
+            setCustomAlcoholName(name);
+            setSelectedAlcohol(null);
+          }}
+          onSearchAlcohol={() => setPickingAlcohol(true)}
+          onClearAlcohol={() => {
+            setSelectedAlcohol(null);
+            setCustomAlcoholName("");
+          }}
           onSubmit={handleSubmit}
           isSubmitting={updateNote.isPending}
           submitLabel="저장"
@@ -129,7 +154,7 @@ export default function EditNotePage({
           <div className="px-5 pb-6">
             <Button
               variant="secondary"
-              onClick={handlePublish}
+              onClick={() => publishNote.mutate(noteId)}
               disabled={publishNote.isPending}
             >
               {publishNote.isPending ? "발행 중..." : "발행하기"}

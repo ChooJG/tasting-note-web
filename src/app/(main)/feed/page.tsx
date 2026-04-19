@@ -6,7 +6,8 @@ import NoteCard from "@/components/notes/NoteCard";
 import Link from "next/link";
 
 function FeedHeader() {
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const { isLoggedIn, nickname, profileImageUrl } = useAuthStore();
+  const initial = (nickname ?? "\uC0AC").charAt(0);
 
   return (
     <header className="flex items-center justify-between px-5 pb-3 pt-4">
@@ -21,9 +22,13 @@ function FeedHeader() {
       {isLoggedIn ? (
         <Link
           href="/profile"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-wine text-[14px] font-semibold text-beige"
+          className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-wine text-[14px] font-semibold text-beige"
         >
-          김
+          {profileImageUrl ? (
+            <img src={profileImageUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            initial
+          )}
         </Link>
       ) : (
         <Link
