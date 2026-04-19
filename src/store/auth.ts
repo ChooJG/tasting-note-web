@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -14,17 +15,25 @@ interface AuthState {
   clearAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  isLoggedIn: false,
-  userId: null,
-  nickname: null,
-  profileImageUrl: null,
-  setAuth: ({ isLoggedIn, userId, nickname, profileImageUrl }) =>
-    set({
-      isLoggedIn,
-      userId: userId ?? null,
-      nickname: nickname ?? null,
-      profileImageUrl: profileImageUrl ?? null,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      userId: null,
+      nickname: null,
+      profileImageUrl: null,
+      setAuth: ({ isLoggedIn, userId, nickname, profileImageUrl }) =>
+        set((prev) => ({
+          isLoggedIn,
+          userId: userId ?? prev.userId,
+          nickname: nickname ?? prev.nickname,
+          profileImageUrl: profileImageUrl !== undefined ? profileImageUrl : prev.profileImageUrl,
+        })),
+      clearAuth: () =>
+        set({ isLoggedIn: false, userId: null, nickname: null, profileImageUrl: null }),
     }),
-  clearAuth: () => set({ isLoggedIn: false, userId: null, nickname: null, profileImageUrl: null }),
-}));
+    {
+      name: "sip-auth",
+    }
+  )
+);

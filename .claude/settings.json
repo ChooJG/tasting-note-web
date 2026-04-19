@@ -15,7 +15,9 @@
       "Bash(cat /Users/choo/VisualProjects/pple-office/next.config.*)",
       "Bash(npx next:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X PUT \"http://localhost:3000/upload/notes/10/images\" -H \"Authorization: Bearer test\")",
-      "Bash(python3 -c \"print\\('\\\\uAF43\\\\uD5A5'\\); print\\('\\\\uAF40'\\)\")"
+      "Bash(python3 -c \"print\\('\\\\uAF43\\\\uD5A5'\\); print\\('\\\\uAF40'\\)\")",
+      "Bash(curl -s -X POST https://api.myfirstsbproject.shop/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"test@test.com\",\"password\":\"test1234\"}')",
+      "Bash(python3 -c \"import sys,json; t=json.load\\(sys.stdin\\); print\\(t.get\\('accessToken',''\\)[:50]\\)\")"
     ],
     "additionalDirectories": [
       "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]",
