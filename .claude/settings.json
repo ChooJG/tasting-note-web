@@ -5,7 +5,11 @@
       "Bash(kill 96910)",
       "Bash(curl -s -X POST https://myfirstsbproject.shop/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"test1234\"}')",
       "WebSearch",
-      "WebFetch(domain:lottiefiles.com)"
+      "WebFetch(domain:lottiefiles.com)",
+      "WebFetch(domain:iconscout.com)",
+      "Bash(curl -s -o /Users/choo/VisualProjects/sip-app/public/cat.json \"https://lottie.host/b60e6cf0-2bcc-4993-a498-4b7a69480fa0/BStMf97gRC.json\")",
+      "Bash(curl -s -o /Users/choo/VisualProjects/sip-app/public/cat.json \"https://assets2.lottiefiles.com/packages/lf20_OT15QW.json\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('/Users/choo/VisualProjects/sip-app/public/cat.json'\\)\\); print\\('name:', d.get\\('nm','?'\\)\\); print\\('layers:', len\\(d.get\\('layers',[]\\)\\)\\); print\\('size:', d.get\\('w'\\), 'x', d.get\\('h'\\)\\)\")"
     ],
     "additionalDirectories": [
       "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]",
