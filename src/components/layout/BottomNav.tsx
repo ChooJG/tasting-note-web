@@ -17,6 +17,17 @@ const navItems = [
     ),
   },
   {
+    label: "탐색",
+    href: "/explore",
+    icon: (
+      <svg width={22} height={22} viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth={1.7}>
+        <circle cx={10} cy={10} r={7} />
+        <path d="M15.5 15.5L20 20" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  null, // FAB
+  {
     label: "내 노트",
     href: "/notes",
     icon: (
@@ -27,7 +38,6 @@ const navItems = [
       </svg>
     ),
   },
-  null, // FAB
   {
     label: "프로필",
     href: "/profile",
@@ -67,7 +77,7 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] ${isActive ? "text-wine" : "text-ink-muted"}`}
+              className={`flex min-w-[48px] flex-col items-center gap-1 rounded-xl px-2 py-2 text-[10.5px] ${isActive ? "text-wine" : "text-ink-muted"}`}
             >
               {item.icon}
               <span>{item.label}</span>

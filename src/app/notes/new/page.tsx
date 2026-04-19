@@ -27,14 +27,16 @@ export default function NewNotePage() {
   const handleSubmit = (data: NoteFormInput) => {
     createNote.mutate({
       alcoholId: data.alcoholId,
+      customAlcoholName: data.customAlcoholName,
       title: data.title || undefined,
       rating: data.rating,
-      tasteIds: data.tasteIds,
-      aromaIds: data.aromaIds,
+      taste: data.taste || undefined,
+      aroma: data.aroma || undefined,
       pairing: data.pairing || undefined,
       description: data.description || undefined,
       drankAt: data.drankAt || undefined,
       location: data.location || undefined,
+      isPublic: data.isPublic,
     });
   };
 

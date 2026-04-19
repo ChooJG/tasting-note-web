@@ -34,7 +34,11 @@ export function useLogin() {
         return;
       }
 
-      setAuth({ isLoggedIn: true });
+      setAuth({
+        isLoggedIn: true,
+        userId: json.userId ?? null,
+        nickname: json.nickname ?? null,
+      });
       router.push(callbackUrl);
     } catch {
       toast("네트워크 오류가 발생했습니다.");

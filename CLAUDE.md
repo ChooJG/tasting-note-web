@@ -11,7 +11,7 @@
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **폰트**: Pretendard (`pretendard` npm 패키지, localFont 사용)
-- **HTTP**: axios (커스텀 인스턴스 `/src/lib/axios.ts`)
+- **HTTP**: fetch (서버: fetchWithAuth/fetchPublic, 클라이언트: Next.js API 라우트 경유)
 - **서버 상태**: @tanstack/react-query
 - **폼**: react-hook-form + zod + @hookform/resolvers
 - **전역 상태**: zustand
@@ -56,9 +56,8 @@ src/
 
 ## API 서버
 
-- **Base URL**: `http://13.124.79.235:8080`
-- **Swagger**: `http://13.124.79.235:8080/swagger-ui/ㄴ.html`
-- **API Docs JSON**: `http://13.124.79.235:8080/api-docs`
+- **Base URL**: `https://myfirstsbproject.shop`
+- **API Docs JSON**: `https://myfirstsbproject.shop/api-docs`
 - **인증 방식**: Bearer JWT (Access Token + Refresh Token)
 
 ## API 엔드포인트 요약
@@ -107,17 +106,19 @@ src/
 ## 주요 타입
 
 ```typescript
-// 노트 생성/수정 시 필수 필드
+// 노트 생성 시 필수 필드
 type NoteCreateRequest = {
-  alcoholId: number; // 필수
-  tasteIds: number[]; // 필수
-  aromaIds: number[]; // 필수
-  rating: number; // 필수 (1~5)
+  alcoholId?: number;
+  customAlcoholName?: string;
   title?: string;
+  taste?: string;          // 쉼표 구분 문자열
+  aroma?: string;          // 쉼표 구분 문자열
+  rating: number;          // 필수 (0.5~5)
   pairing?: string;
   description?: string;
-  drankAt?: string; // 'YYYY-MM-DD'
+  drankAt?: string;        // 'YYYY-MM-DD'
   location?: string;
+  isPublic?: boolean;
 };
 
 // 노트 수정 시 추가 필드

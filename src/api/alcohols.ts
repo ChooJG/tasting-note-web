@@ -4,9 +4,13 @@ type AlcoholResponse = components["schemas"]["AlcoholResponse"];
 type AlcoholCategory = NonNullable<AlcoholResponse["category"]>;
 
 async function handleResponse<T>(res: Response): Promise<T> {
-  const json = await res.json();
-  if (!res.ok || !json.success) throw new Error(json.message ?? "요청에 실패했습니다.");
-  return json.data;
+  if (!res.ok) {
+    const text = await res.text();
+    let message = "요청에 실패했습니다.";
+    try { message = JSON.parse(text).message ?? message; } catch {}
+    throw new Error(message);
+  }
+  return res.json();
 }
 
 export async function getAlcoholsByCategory(category: AlcoholCategory): Promise<AlcoholResponse[]> {

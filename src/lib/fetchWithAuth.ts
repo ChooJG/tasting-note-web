@@ -28,9 +28,11 @@ export async function fetchWithAuth(
 
     if (refreshRes.ok) {
       const refreshData = await refreshRes.json();
-      if (refreshData.success && refreshData.data) {
-        session.accessToken = refreshData.data.accessToken;
-        session.refreshToken = refreshData.data.refreshToken;
+      // 새 스펙: TokenResponse 직접 반환 또는 data 래핑
+      const tokenData = refreshData.data ?? refreshData;
+      if (tokenData.accessToken) {
+        session.accessToken = tokenData.accessToken;
+        session.refreshToken = tokenData.refreshToken;
         await session.save();
 
         res = await doFetch(session.accessToken);

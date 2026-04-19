@@ -28,7 +28,6 @@ export default function EditNotePage({
 
   const [pickingAlcohol, setPickingAlcohol] = useState(false);
   const [alcohol, setAlcohol] = useState<AlcoholResponse | null>(null);
-  const [isPublic, setIsPublic] = useState(true);
 
   if (isLoading) {
     return (
@@ -55,15 +54,16 @@ export default function EditNotePage({
   const handleSubmit = (data: NoteFormInput) => {
     updateNote.mutate({
       alcoholId: data.alcoholId,
+      customAlcoholName: data.customAlcoholName,
       title: data.title || undefined,
       rating: data.rating,
-      tasteIds: data.tasteIds,
-      aromaIds: data.aromaIds,
+      taste: data.taste || undefined,
+      aroma: data.aroma || undefined,
       pairing: data.pairing || undefined,
       description: data.description || undefined,
       drankAt: data.drankAt || undefined,
       location: data.location || undefined,
-      isPublic,
+      isPublic: data.isPublic ?? false,
     });
   };
 
@@ -112,34 +112,21 @@ export default function EditNotePage({
           isSubmitting={updateNote.isPending}
           submitLabel="저장"
           defaultValues={{
-            alcoholId: note.alcoholId!,
+            alcoholId: note.alcoholId,
             title: note.title ?? "",
             rating: note.rating ?? 0,
-            tasteIds: note.tastes?.map((t) => t.id!) ?? [],
-            aromaIds: note.aromas?.map((a) => a.id!) ?? [],
+            taste: note.taste ?? "",
+            aroma: note.aroma ?? "",
             pairing: note.pairing ?? "",
             description: note.description ?? "",
             drankAt: note.drankAt ?? "",
             location: note.location ?? "",
+            isPublic: note.isPublic ?? false,
           }}
         />
 
-        {/* Public toggle + Publish */}
-        <div className="px-5 pb-6">
-          <div className="mb-4 flex items-center justify-between rounded-input border-[1.5px] border-beige-dark bg-white p-3.5">
-            <span className="text-[15px] text-ink">공개 노트로 발행</span>
-            <button
-              type="button"
-              onClick={() => setIsPublic(!isPublic)}
-              className={`relative h-[26px] w-[44px] rounded-full transition-colors ${isPublic ? "bg-wine" : "bg-beige-dark"}`}
-            >
-              <div
-                className={`absolute top-[3px] h-5 w-5 rounded-full bg-white transition-all ${isPublic ? "right-[3px]" : "left-[3px]"}`}
-              />
-            </button>
-          </div>
-
-          {isDraft && (
+        {isDraft && (
+          <div className="px-5 pb-6">
             <Button
               variant="secondary"
               onClick={handlePublish}
@@ -147,8 +134,8 @@ export default function EditNotePage({
             >
               {publishNote.isPending ? "발행 중..." : "발행하기"}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

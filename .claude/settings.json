@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kill 14852)",
+      "Bash(kill 96910)"
+    ],
+    "additionalDirectories": [
+      "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]"
+    ]
+  }
+}

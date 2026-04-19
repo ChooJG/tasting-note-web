@@ -4,7 +4,6 @@ type FlavorSuggestionResponse = components["schemas"]["FlavorSuggestionResponse"
 
 export async function getFlavors(): Promise<FlavorSuggestionResponse[]> {
   const res = await fetch("/api/flavors");
-  const json = await res.json();
-  if (!res.ok || !json.success) throw new Error(json.message ?? "요청에 실패했습니다.");
-  return json.data;
+  if (!res.ok) throw new Error("맛/향 목록을 불러오는데 실패했습니다.");
+  return res.json();
 }

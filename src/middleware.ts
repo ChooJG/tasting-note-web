@@ -1,21 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 로그인 필요한 경로 (노트 생성/수정, 내 노트, 프로필)
-// 노트 상세(/notes/[id])는 공개 노트도 있으므로 보호하지 않음
-const PROTECTED_PATHS = ["/notes/new", "/notes/my", "/profile"];
+// 로그인 없이 접근 가능한 경로
+const PUBLIC_PATHS = [
+  "/feed",
+  "/login",
+  "/signup",
+  "/explore",
+];
 
-function isProtected(pathname: string) {
-  // /notes/[id]/edit 패턴도 보호
-  if (/^\/notes\/\d+\/edit/.test(pathname)) return true;
-  return PROTECTED_PATHS.some((p) => pathname.startsWith(p));
+function isPublicPath(pathname: string) {
+  // 정확히 "/" (루트)
+  if (pathname === "/") return true;
+
+  // 공개 경로
+  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) return true;
+
+  // 노트 상세 (/notes/[id]) — 공개 노트 조회 가능, 단 new/edit은 보호
+  if (/^\/notes\/\d+$/.test(pathname)) return true;
+
+  // API 라우트는 middleware에서 건드리지 않음
+  if (pathname.startsWith("/api/")) return true;
+
+  // 정적 파일
+  if (pathname.startsWith("/_next/") || pathname.startsWith("/favicon")) return true;
+
+  return false;
 }
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const hasSession = req.cookies.has("sip-session");
 
-  // 비로그인 + 보호 경로 → 로그인으로 (callbackUrl 포함)
-  if (!hasSession && isProtected(pathname)) {
+  if (isPublicPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  // 비로그인 + 보호 경로 → 로그인으로 리다이렉트
+  const hasSession = req.cookies.has("sip-session");
+  if (!hasSession) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
@@ -25,5 +46,11 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/notes/:path*", "/profile/:path*"],
+  matcher: [
+    /*
+     * _next/static, _next/image, favicon.ico 등 정적 파일 제외
+     * 나머지 모든 경로에서 middleware 실행
+     */
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico)$).*)",
+  ],
 };

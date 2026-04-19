@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getPublicNotes, getMyNotes, getNote } from "@/api/notes";
+import { useAuthStore } from "@/store/auth";
 
 export function usePublicNotes() {
   return useQuery({
@@ -11,9 +12,12 @@ export function usePublicNotes() {
 }
 
 export function useMyNotes(status?: "DRAFT" | "PUBLISHED") {
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
   return useQuery({
     queryKey: ["notes", "my", status],
     queryFn: () => getMyNotes(status),
+    enabled: isLoggedIn,
   });
 }
 

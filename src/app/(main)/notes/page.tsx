@@ -1,21 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useMyNotes } from "@/hooks/useNotes";
-import NoteCard from "@/components/notes/NoteCard";
 
-type StatusFilter = "ALL" | "PUBLISHED" | "DRAFT";
+type StatusFilter = "PUBLISHED" | "DRAFT";
 
 const TABS: { label: string; value: StatusFilter }[] = [
-  { label: "전체", value: "ALL" },
-  { label: "발행됨", value: "PUBLISHED" },
-  { label: "임시저장", value: "DRAFT" },
+  { label: "\uBC1C\uD589\uB41C", value: "PUBLISHED" },
+  { label: "\uC784\uC2DC\uC800\uC7A5", value: "DRAFT" },
 ];
 
+
 export default function MyNotesPage() {
-  const [filter, setFilter] = useState<StatusFilter>("ALL");
-  const queryStatus = filter === "ALL" ? undefined : filter;
-  const { data: notes, isLoading } = useMyNotes(queryStatus as "DRAFT" | "PUBLISHED" | undefined);
+  const [filter, setFilter] = useState<StatusFilter>("PUBLISHED");
+  const { data: notes, isLoading } = useMyNotes(filter);
 
   return (
     <>
@@ -43,8 +42,8 @@ export default function MyNotesPage() {
         ))}
       </div>
 
-      {/* List */}
-      <div className="flex-1 overflow-y-auto px-4 pb-6 pt-3">
+      {/* Grid */}
+      <div className="flex-1 overflow-y-auto">
         {isLoading && (
           <div className="py-20 text-center text-[14px] text-ink-muted">
             불러오는 중...
@@ -54,16 +53,33 @@ export default function MyNotesPage() {
           <div className="py-20 text-center text-[14px] text-ink-muted">
             {filter === "DRAFT"
               ? "임시저장된 노트가 없습니다."
-              : filter === "PUBLISHED"
-                ? "발행된 노트가 없습니다."
-                : "작성한 노트가 없습니다."}
+              : "발행된 노트가 없습니다."}
           </div>
         )}
-        <div className="flex flex-col gap-3">
-          {notes?.map((note) => (
-            <NoteCard key={note.id} note={note} showStatus />
-          ))}
-        </div>
+        {notes && notes.length > 0 && (
+          <div className="grid grid-cols-3 gap-[2px] p-[2px]">
+            {notes.map((note) => {
+              const icon = "\u{1F377}";
+              return (
+                <Link
+                  key={note.id}
+                  href={`/notes/${note.id}`}
+                  className="relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden bg-beige-mid"
+                >
+                  {/* TODO: note.imageUrl이 있으면 이미지 표시 */}
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[13px] text-rating">
+                      ★ {note.rating?.toFixed(1) ?? "-"}
+                    </span>
+                    <span className="px-1 text-center text-[10px] text-ink-muted">
+                      {note.alcoholNameKo ?? note.alcoholName ?? icon}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     </>
   );

@@ -5,9 +5,16 @@ type NoteCreateRequest = components["schemas"]["NoteCreateRequest"];
 type NoteUpdateRequest = components["schemas"]["NoteUpdateRequest"];
 
 async function handleResponse<T>(res: Response): Promise<T> {
-  const json = await res.json();
-  if (!res.ok || !json.success) throw new Error(json.message ?? "요청에 실패했습니다.");
-  return json.data;
+  if (!res.ok) {
+    const text = await res.text();
+    let message = "요청에 실패했습니다.";
+    try {
+      const json = JSON.parse(text);
+      message = json.message ?? message;
+    } catch {}
+    throw new Error(message);
+  }
+  return res.json();
 }
 
 export async function getPublicNotes(): Promise<NoteResponse[]> {
@@ -51,8 +58,12 @@ export async function publishNote(noteId: number): Promise<NoteResponse> {
 
 export async function deleteNote(noteId: number): Promise<void> {
   const res = await fetch(`/api/notes/${noteId}`, { method: "DELETE" });
-  const json = await res.json();
-  if (!res.ok || !json.success) throw new Error(json.message ?? "삭제에 실패했습니다.");
+  if (!res.ok) {
+    const text = await res.text();
+    let message = "삭제에 실패했습니다.";
+    try { message = JSON.parse(text).message ?? message; } catch {}
+    throw new Error(message);
+  }
 }
 
 export async function reportNote(
@@ -64,6 +75,10 @@ export async function reportNote(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  const json = await res.json();
-  if (!res.ok || !json.success) throw new Error(json.message ?? "신고에 실패했습니다.");
+  if (!res.ok) {
+    const text = await res.text();
+    let message = "신고에 실패했습니다.";
+    try { message = JSON.parse(text).message ?? message; } catch {}
+    throw new Error(message);
+  }
 }

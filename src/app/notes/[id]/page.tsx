@@ -19,6 +19,11 @@ function formatDate(dateStr?: string) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
+function parseTags(str?: string): string[] {
+  if (!str) return [];
+  return str.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
 export default function NoteDetailPage({
   params,
 }: {
@@ -56,158 +61,183 @@ export default function NoteDetailPage({
   const isDraft = note.status === "DRAFT";
   const isOwner = isLoggedIn && userId != null && note.userId === userId;
   const stars = Array.from({ length: 5 }, (_, i) => i < (note.rating ?? 0));
+  const tasteTags = parseTags(note.taste);
+  const aromaTags = parseTags(note.aroma);
+  const hasImages = note.imageUrls && note.imageUrls.length > 0;
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      {/* Hero */}
-      <div className="shrink-0 bg-wine px-5 pb-7 pt-6">
-        <div className="mb-4 flex items-center justify-between">
+    <div className="flex min-h-dvh flex-col bg-beige">
+      {/* Carousel / Hero image area */}
+      <div className="relative shrink-0">
+        {hasImages ? (
+          <img
+            src={note.imageUrls![0]}
+            alt=""
+            className="h-[240px] w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-[240px] items-center justify-center bg-beige-mid text-[56px]">
+            {"\u{1F377}"}
+          </div>
+        )}
+
+        {/* Overlay buttons */}
+        <button
+          onClick={() => router.back()}
+          className="absolute left-3.5 top-3.5 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-black/35"
+        >
+          <svg width={17} height={17} viewBox="0 0 17 17" fill="none">
+            <path d="M10.5 3.5L6 8.5L10.5 13.5" stroke="white" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {isLoggedIn && (
           <button
-            onClick={() => router.back()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-beige/15"
+            onClick={() => setOptionsOpen(true)}
+            className="absolute right-3.5 top-3.5 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-black/35"
           >
-            <svg width={18} height={18} viewBox="0 0 18 18" fill="none">
-              <path
-                d="M11 4L6 9L11 14"
-                stroke="#F0EAE0"
-                strokeWidth={1.8}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width={17} height={17} viewBox="0 0 17 17" fill="white">
+              <circle cx={8.5} cy={3.5} r={1.3} />
+              <circle cx={8.5} cy={8.5} r={1.3} />
+              <circle cx={8.5} cy={13.5} r={1.3} />
             </svg>
           </button>
-          {isLoggedIn && (
-            <button
-              onClick={() => setOptionsOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-beige/15 text-beige"
-            >
-              <svg width={18} height={18} viewBox="0 0 18 18" fill="currentColor">
-                <circle cx={9} cy={4} r={1.5} />
-                <circle cx={9} cy={9} r={1.5} />
-                <circle cx={9} cy={14} r={1.5} />
-              </svg>
-            </button>
-          )}
-        </div>
+        )}
 
-        <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-beige/60">
-          {note.alcoholNameKo ?? note.alcoholName}
-        </p>
-        <h1 className="mb-1 text-[24px] font-semibold tracking-[-0.03em] text-beige">
-          {note.title ?? "테이스팅 노트"}
-        </h1>
-        <p className="mb-4 text-[14px] text-beige/75">{note.alcoholName}</p>
-        <div className="flex items-center gap-1.5">
-          {stars.map((filled, i) => (
-            <span
-              key={i}
-              className={`text-[16px] ${filled ? "text-rating" : "text-beige/30"}`}
-            >
-              ★
-            </span>
-          ))}
-          <span className="ml-1 text-[16px] font-medium text-beige">
-            {note.rating?.toFixed(1)}
-          </span>
-          <span className="text-[12px] text-beige/50">
-            · {formatDate(note.drankAt ?? note.createdAt)}
-          </span>
-        </div>
+        {/* Image dots */}
+        {hasImages && note.imageUrls!.length > 1 && (
+          <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-[5px]">
+            {note.imageUrls!.map((_, i) => (
+              <div key={i} className={`h-1.5 rounded-full ${i === 0 ? "w-[18px] bg-white" : "w-1.5 bg-white/50"}`} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto pb-6">
-        {/* Aroma */}
-        {note.aromas && note.aromas.length > 0 && (
-          <section className="px-5 pt-5">
-            <h2 className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
-              향 (Aroma)
-            </h2>
-            <div className="flex flex-wrap gap-[7px]">
-              {note.aromas.map((a) => (
-                <span
-                  key={a.id}
-                  className="rounded-pill bg-beige-mid px-3 py-[5px] text-[13px] text-ink-soft"
-                >
-                  {a.name}
-                </span>
-              ))}
+        {/* Basic info */}
+        <div className="border-b border-beige-mid px-5 pb-4 pt-[18px]">
+          <div className="mb-1.5 flex items-start justify-between">
+            <div>
+              <h1 className="text-[22px] font-semibold tracking-[-0.03em] text-ink">
+                {note.alcoholNameKo ?? note.alcoholName ?? note.customAlcoholName}
+              </h1>
+              {note.alcoholName && (
+                <p className="mt-0.5 text-[13px] text-ink-muted">
+                  {note.alcoholName}
+                </p>
+              )}
             </div>
-          </section>
-        )}
+          </div>
+
+          <div className="mb-1.5 flex items-center gap-1.5">
+            {stars.map((filled, i) => (
+              <span key={i} className={`text-[13px] ${filled ? "text-rating" : "text-beige-dark"}`}>
+                ★
+              </span>
+            ))}
+            <span className="ml-0.5 text-[14px] font-medium text-ink-soft">
+              {note.rating?.toFixed(1)}
+            </span>
+          </div>
+          <p className="text-[13px] text-ink-muted">
+            유저 #{note.userId} · {formatDate(note.drankAt ?? note.createdAt)}
+          </p>
+        </div>
 
         {/* Taste */}
-        {note.tastes && note.tastes.length > 0 && (
-          <section className="px-5 pt-5">
-            <h2 className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
-              맛 (Taste)
+        {tasteTags.length > 0 && (
+          <section className="px-5 pt-[18px]">
+            <h2 className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
+              맛
             </h2>
-            <div className="flex flex-wrap gap-[7px]">
-              {note.tastes.map((t) => (
-                <span
-                  key={t.id}
-                  className="rounded-pill bg-beige-mid px-3 py-[5px] text-[13px] text-ink-soft"
-                >
-                  {t.name}
+            <div className="flex flex-wrap gap-[6px]">
+              {tasteTags.map((t, i) => (
+                <span key={i} className="rounded-pill bg-beige-mid px-3 py-[5px] text-[13px] text-ink-soft">
+                  {t}
                 </span>
               ))}
             </div>
           </section>
         )}
 
-        {/* Pairing */}
-        {note.pairing && (
-          <section className="px-5 pt-5">
-            <h2 className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
-              페어링
+        {/* Aroma */}
+        {aromaTags.length > 0 && (
+          <section className="px-5 pt-[18px]">
+            <h2 className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
+              향
             </h2>
-            <p className="text-[15px] font-light leading-[1.7] text-ink-soft">
-              {note.pairing}
-            </p>
+            <div className="flex flex-wrap gap-[6px]">
+              {aromaTags.map((a, i) => (
+                <span key={i} className="rounded-pill bg-beige-mid px-3 py-[5px] text-[13px] text-ink-soft">
+                  {a}
+                </span>
+              ))}
+            </div>
           </section>
         )}
 
         {/* Description */}
         {note.description && (
-          <section className="px-5 pt-5">
-            <h2 className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
-              노트
+          <section className="px-5 pt-[18px]">
+            <h2 className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
+              테이스팅 노트
             </h2>
-            <p className="text-[15px] font-light leading-[1.7] text-ink-soft">
+            <p className="text-[15px] font-light leading-[1.75] text-ink-soft">
               {note.description}
             </p>
           </section>
         )}
 
-        {/* Location */}
-        {note.location && (
-          <section className="mt-4 px-5">
+        {/* Pairing */}
+        {note.pairing && (
+          <section className="px-5 pt-[18px]">
+            <h2 className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
+              페어링
+            </h2>
             <p className="flex items-center gap-1.5 text-[13px] text-ink-muted">
-              <svg width={14} height={14} viewBox="0 0 14 14" fill="currentColor">
-                <path d="M7 1C4.8 1 3 2.8 3 5C3 7.5 7 13 7 13S11 7.5 11 5C11 2.8 9.2 1 7 1ZM7 6.5C6.2 6.5 5.5 5.8 5.5 5S6.2 3.5 7 3.5 8.5 4.2 8.5 5 7.8 6.5 7 6.5Z" />
-              </svg>
-              {note.location}
+              🍽️ {note.pairing}
             </p>
           </section>
         )}
-      </div>
 
-      {/* Actions — 본인 노트에만 표시 */}
-      {isOwner && (
-        <div className="shrink-0 flex gap-2.5 px-5 pb-6">
-          <Button
-            variant="secondary"
-            onClick={() => router.push(`/notes/${noteId}/edit`)}
-          >
-            수정
-          </Button>
-          {isDraft && (
+        {/* Location & date */}
+        <section className="px-5 pt-[18px]">
+          {note.location && (
+            <p className="flex items-center gap-1.5 text-[13px] text-ink-muted">
+              📍 {note.location}
+            </p>
+          )}
+          {(note.drankAt || note.createdAt) && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-ink-muted">
+              📅 {formatDate(note.drankAt ?? note.createdAt)}
+            </p>
+          )}
+        </section>
+
+        {/* Actions */}
+        <div className="mt-5 flex gap-2.5 px-5">
+          {isOwner && (
+            <Button
+              variant="secondary"
+              onClick={() => router.push(`/notes/${noteId}/edit`)}
+            >
+              수정
+            </Button>
+          )}
+          {isOwner && isDraft && (
             <Button onClick={() => publishMutation.mutate(noteId)}>
               발행
             </Button>
           )}
+          {!isOwner && isLoggedIn && (
+            <Button onClick={() => setReportOpen(true)}>
+              신고
+            </Button>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Options Modal */}
       <Modal
@@ -222,9 +252,9 @@ export default function NoteDetailPage({
                 setOptionsOpen(false);
                 router.push(`/notes/${noteId}/edit`);
               }}
-              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
+              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left active:bg-beige"
             >
-              <span className="text-[18px]">✏️</span>
+              <span className="w-6 text-center text-[17px]">✏️</span>
               <span className="text-[15px] text-ink">수정하기</span>
             </button>
           )}
@@ -234,9 +264,9 @@ export default function NoteDetailPage({
                 setOptionsOpen(false);
                 setReportOpen(true);
               }}
-              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
+              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left active:bg-beige"
             >
-              <span className="text-[18px]">🚩</span>
+              <span className="w-6 text-center text-[17px]">🚩</span>
               <span className="text-[15px] text-ink">신고하기</span>
             </button>
           )}
@@ -246,9 +276,9 @@ export default function NoteDetailPage({
                 setOptionsOpen(false);
                 deleteMutation.mutate(noteId);
               }}
-              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left"
+              className="flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left active:bg-beige"
             >
-              <span className="text-[18px]">🗑️</span>
+              <span className="w-6 text-center text-[17px]">🗑️</span>
               <span className="text-[15px] text-[#C0392B]">삭제하기</span>
             </button>
           )}

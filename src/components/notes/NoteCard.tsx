@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import type { components } from "@/types/api";
-import Rating from "@/components/ui/Rating";
 import Tag from "@/components/ui/Tag";
 
 type NoteResponse = components["schemas"]["NoteResponse"];
@@ -19,14 +18,13 @@ const STATUS_STYLES = {
 } as const;
 
 const STATUS_LABELS = {
-  PUBLISHED: "발행됨",
-  DRAFT: "임시저장",
+  PUBLISHED: "\uBC1C\uD589\uB428",
+  DRAFT: "\uC784\uC2DC\uC800\uC7A5",
 } as const;
 
-function formatDate(dateStr?: string) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+function parseTags(str?: string): string[] {
+  if (!str) return [];
+  return str.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
 export default function NoteCard({
@@ -34,68 +32,79 @@ export default function NoteCard({
   showAuthor = false,
   showStatus = false,
 }: NoteCardProps) {
-  const allTags = [
-    ...(note.aromas ?? []),
-    ...(note.tastes ?? []),
-  ];
+  const allTags = [...parseTags(note.taste), ...parseTags(note.aroma)];
+  const stars = Array.from({ length: 5 }, (_, i) => i < (note.rating ?? 0));
+  const hasImage = note.imageUrls && note.imageUrls.length > 0;
 
   return (
     <Link href={`/notes/${note.id}`} className="block">
-      <article className="rounded-[18px] bg-white p-[18px] shadow-[0_1px_3px_rgba(30,18,8,0.06),0_4px_12px_rgba(30,18,8,0.04)]">
-        {/* Eyebrow */}
-        <div className="mb-2.5 flex items-center justify-between">
-          {note.alcoholName && (
-            <Tag variant="category">
-              {note.alcoholNameKo ?? note.alcoholName}
-            </Tag>
-          )}
-          <span className="text-[11px] text-ink-muted">
-            {formatDate(note.drankAt ?? note.createdAt)}
-          </span>
-        </div>
-
-        {/* Title */}
-        {note.title && (
-          <h3 className="mb-1 text-[16px] font-medium tracking-[-0.02em] text-ink">
-            {note.title}
-          </h3>
-        )}
-
-        {/* Alcohol name */}
-        <p className="mb-2.5 text-[13px] text-ink-soft">
-          {note.alcoholName}
-        </p>
-
-        {/* Tags */}
-        {allTags.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {allTags.slice(0, 5).map((tag) => (
-              <Tag key={tag.id}>{tag.name}</Tag>
-            ))}
+      <article className="overflow-hidden rounded-[18px] bg-white shadow-[0_1px_3px_rgba(30,18,8,0.05),0_4px_12px_rgba(30,18,8,0.04)] active:scale-[0.985]">
+        {/* Image / Placeholder */}
+        {hasImage ? (
+          <img
+            src={note.imageUrls![0]}
+            alt=""
+            className="h-[200px] w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-[200px] items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+            <span className="text-[40px]">{"\u{1F377}"}</span>
           </div>
         )}
 
-        {/* Footer */}
-        <div className="flex items-center justify-between">
-          {showStatus && note.status ? (
-            <span
-              className={`rounded-pill px-2.5 py-0.5 text-[11px] font-medium ${STATUS_STYLES[note.status]}`}
-            >
-              {STATUS_LABELS[note.status]}
-            </span>
-          ) : showAuthor ? (
-            <div className="flex items-center gap-2">
-              <div className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-wine text-[11px] font-semibold text-beige">
-                {(note.userId ?? 0) % 2 === 0 ? "김" : "박"}
-              </div>
-              <span className="text-[12px] text-ink-muted">
-                user_{note.userId}
+        <div className="p-4">
+          {/* Meta row */}
+          <div className="mb-1.5 flex items-center justify-between">
+            {note.alcoholName && (
+              <Tag variant="category">
+                {note.alcoholNameKo ?? note.alcoholName}
+              </Tag>
+            )}
+            {showStatus && note.status ? (
+              <span className={`rounded-pill px-2.5 py-0.5 text-[11px] font-medium ${STATUS_STYLES[note.status]}`}>
+                {STATUS_LABELS[note.status]}
               </span>
+            ) : showAuthor ? (
+              <span className="text-[12px] text-ink-muted">
+                유저 #{note.userId}
+              </span>
+            ) : null}
+          </div>
+
+          {/* Rating */}
+          <div className="mb-2 flex items-center gap-[5px]">
+            <div className="flex gap-0.5">
+              {stars.map((filled, i) => (
+                <span key={i} className={`text-[13px] ${filled ? "text-rating" : "text-beige-dark"}`}>
+                  ★
+                </span>
+              ))}
             </div>
-          ) : (
-            <div />
+            <span className="text-[13px] font-medium text-ink-soft">
+              {note.rating?.toFixed(1)}
+            </span>
+          </div>
+
+          {/* Alcohol name */}
+          <p className="mb-1 text-[13px] text-ink-soft">
+            {note.alcoholNameKo ?? note.alcoholName}
+          </p>
+
+          {/* Title */}
+          {note.title && (
+            <h3 className="mb-2 text-[16px] font-medium tracking-[-0.02em] text-ink">
+              {note.title}
+            </h3>
           )}
-          <Rating value={note.rating ?? 0} size="sm" readonly />
+
+          {/* Tags */}
+          {allTags.length > 0 && (
+            <div className="flex flex-wrap gap-[5px]">
+              {allTags.slice(0, 5).map((tag, i) => (
+                <Tag key={i}>{tag}</Tag>
+              ))}
+            </div>
+          )}
         </div>
       </article>
     </Link>
