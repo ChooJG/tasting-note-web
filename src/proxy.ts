@@ -6,6 +6,8 @@ const PUBLIC_PATHS = [
   "/login",
   "/signup",
   "/explore",
+  "/profile/privacy",
+  "/profile/terms",
 ];
 
 function isPublicPath(pathname: string) {
@@ -23,11 +25,12 @@ function isPublicPath(pathname: string) {
 
   // 정적 파일
   if (pathname.startsWith("/_next/") || pathname.startsWith("/favicon")) return true;
+  if (/\.\w+$/.test(pathname)) return true;
 
   return false;
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (isPublicPath(pathname)) {
@@ -48,9 +51,8 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * _next/static, _next/image, favicon.ico 등 정적 파일 제외
-     * 나머지 모든 경로에서 middleware 실행
+     * API 라우트, _next, 정적 파일 제외
      */
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico)$).*)",
+    "/((?!api/|upload/|_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|json)$).*)",
   ],
 };

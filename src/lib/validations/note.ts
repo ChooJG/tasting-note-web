@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 
 export const noteFormSchema = z.object({
-  alcoholId: z.number().optional(),
+  alcoholId: z.number().nullable().optional(),
   customAlcoholName: z.string().optional(),
   title: z.string().optional(),
   rating: z.number().min(0.5, "평점을 선택해주세요.").max(5),

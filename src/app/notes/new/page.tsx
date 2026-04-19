@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCreateNote } from "@/hooks/useCreateNote";
 import { toast } from "@/components/ui/Toast";
+import { uploadNoteImages } from "@/lib/uploadImage";
 import AlcoholSearch from "@/components/notes/AlcoholSearch";
 import type { AlcoholSelection } from "@/components/notes/AlcoholSearch";
 import NoteForm from "@/components/notes/NoteForm";
@@ -17,6 +19,7 @@ export default function NewNotePage() {
   const [pickingAlcohol, setPickingAlcohol] = useState(false);
   const [selectedAlcohol, setSelectedAlcohol] = useState<AlcoholResponse | null>(null);
   const [customAlcoholName, setCustomAlcoholName] = useState("");
+  const queryClient = useQueryClient();
   const createNote = useCreateNote();
 
   const handleAlcoholSelect = (selection: AlcoholSelection) => {
@@ -54,13 +57,11 @@ export default function NewNotePage() {
       {
         onSuccess: async (note) => {
           if (photos.length > 0 && note.id) {
-            const formData = new FormData();
-            photos.forEach((file) => formData.append("images", file));
-            await fetch(`/api/notes/${note.id}/images`, {
-              method: "PUT",
-              body: formData,
-            });
+            await uploadNoteImages(note.id, photos).catch(() => {});
           }
+          await queryClient.invalidateQueries({ queryKey: ["notes"] });
+          toast("노트가 저장되었습니다");
+          router.push(`/notes/${note.id}`);
         },
       }
     );

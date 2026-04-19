@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useNote } from "@/hooks/useNotes";
 import {
@@ -41,6 +41,8 @@ export default function NoteDetailPage({
 
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const touchStartX = useRef(0);
 
   if (isLoading) {
     return (
@@ -68,22 +70,34 @@ export default function NoteDetailPage({
   return (
     <div className="flex min-h-dvh flex-col bg-beige">
       {/* Carousel / Hero image area */}
-      <div className="relative shrink-0">
+      <div
+        className="relative shrink-0 overflow-hidden"
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          if (!hasImages || note.imageUrls!.length <= 1) return;
+          const diff = touchStartX.current - e.changedTouches[0].clientX;
+          if (diff > 50) setCarouselIndex((i) => Math.min(i + 1, note.imageUrls!.length - 1));
+          if (diff < -50) setCarouselIndex((i) => Math.max(i - 1, 0));
+        }}
+      >
         {hasImages ? (
-          <img
-            src={note.imageUrls![0]}
-            alt=""
-            className="h-[240px] w-full object-cover"
-          />
+          <div
+            className="flex transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+          >
+            {note.imageUrls!.map((url, i) => (
+              <img key={i} src={url} alt="" className="h-[240px] w-full shrink-0 object-cover" />
+            ))}
+          </div>
         ) : (
           <div className="flex h-[240px] items-center justify-center bg-beige-mid text-[56px]">
-            {"\u{1F377}"}
+            🍷
           </div>
         )}
 
         {/* Overlay buttons */}
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/feed")}
           className="absolute left-3.5 top-3.5 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-black/35"
         >
           <svg width={17} height={17} viewBox="0 0 17 17" fill="none">
@@ -104,13 +118,35 @@ export default function NoteDetailPage({
           </button>
         )}
 
-        {/* Image dots */}
+        {/* Carousel arrows + dots */}
         {hasImages && note.imageUrls!.length > 1 && (
-          <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-[5px]">
-            {note.imageUrls!.map((_, i) => (
-              <div key={i} className={`h-1.5 rounded-full ${i === 0 ? "w-[18px] bg-white" : "w-1.5 bg-white/50"}`} />
-            ))}
-          </div>
+          <>
+            {carouselIndex > 0 && (
+              <button
+                onClick={() => setCarouselIndex((i) => i - 1)}
+                className="absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/30"
+              >
+                <svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+                  <path d="M10 3L5 8L10 13" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+            {carouselIndex < note.imageUrls!.length - 1 && (
+              <button
+                onClick={() => setCarouselIndex((i) => i + 1)}
+                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/30"
+              >
+                <svg width={16} height={16} viewBox="0 0 16 16" fill="none">
+                  <path d="M6 3L11 8L6 13" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+            <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-[5px]">
+              {note.imageUrls!.map((_, i) => (
+                <div key={i} className={`h-1.5 rounded-full transition-all ${i === carouselIndex ? "w-[18px] bg-white" : "w-1.5 bg-white/50"}`} />
+              ))}
+            </div>
+          </>
         )}
       </div>
 
@@ -142,7 +178,7 @@ export default function NoteDetailPage({
             </span>
           </div>
           <p className="text-[13px] text-ink-muted">
-            유저 #{note.userId} · {formatDate(note.drankAt ?? note.createdAt)}
+            {note.nickname ?? `유저 #${note.userId}`} · {formatDate(note.drankAt ?? note.createdAt)}
           </p>
         </div>
 
@@ -184,7 +220,7 @@ export default function NoteDetailPage({
             <h2 className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-ink-muted">
               테이스팅 노트
             </h2>
-            <p className="text-[15px] font-light leading-[1.75] text-ink-soft">
+            <p className="whitespace-pre-line text-[15px] font-light leading-[1.75] text-ink-soft">
               {note.description}
             </p>
           </section>

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { toast } from "@/components/ui/Toast";
+import { uploadProfileImage } from "@/lib/uploadImage";
 import Button from "@/components/ui/Button";
 
 export default function ProfileImagePage() {
@@ -34,22 +35,16 @@ export default function ProfileImagePage() {
     if (!selectedFile) return;
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      const res = await fetch("/api/auth/me/profile-image", {
+      const data = await uploadProfileImage(selectedFile);
+      setAuth({ isLoggedIn: true, nickname, profileImageUrl: data.profileImageUrl });
+      // 세션에도 저장
+      await fetch("/api/auth/me/profile-image", {
         method: "PATCH",
-        body: formData,
-      });
-      const data = await res.json();
-
-      if (res.ok && data.profileImageUrl) {
-        setAuth({ isLoggedIn: true, nickname, profileImageUrl: data.profileImageUrl });
-        toast("\uD504\uB85C\uD544 \uC774\uBBF8\uC9C0\uAC00 \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4");
-        router.back();
-      } else {
-        toast(data.message ?? "\uC774\uBBF8\uC9C0 \uC5C5\uB85C\uB4DC\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4");
-      }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileImageUrl: data.profileImageUrl }),
+      }).catch(() => {});
+      toast("\uD504\uB85C\uD544 \uC774\uBBF8\uC9C0\uAC00 \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4");
+      router.back();
     } catch {
       toast("\uB124\uD2B8\uC6CC\uD06C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4");
     } finally {

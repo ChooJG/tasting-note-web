@@ -10,6 +10,7 @@ export interface components {
       id?: number;
       /** Format: int64 */
       userId?: number;
+      nickname?: string;
       /** Format: int64 */
       alcoholId?: number;
       alcoholName?: string;

@@ -3,8 +3,6 @@ import { getSession } from "@/lib/session";
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
-export const runtime = "nodejs";
-
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ noteId: string }> }
@@ -16,28 +14,21 @@ export async function PUT(
     return NextResponse.json({ message: "인증이 필요합니다." }, { status: 401 });
   }
 
-  // 클라이언트 FormData에서 파일들 추출
-  const incoming = await req.formData();
-  const files = incoming.getAll("images") as File[];
+  // raw body + Content-Type(boundary 포함)을 그대로 백엔드에 전달
+  const contentType = req.headers.get("content-type");
+  const body = await req.arrayBuffer();
 
-  if (files.length === 0) {
-    return NextResponse.json({ message: "파일이 없습니다." }, { status: 400 });
-  }
-
-  // 백엔드용 FormData 새로 구성
-  const outgoing = new FormData();
-  for (const file of files) {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const blob = new Blob([buffer], { type: file.type });
-    outgoing.append("images", blob, file.name);
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${session.accessToken}`,
+  };
+  if (contentType) {
+    headers["Content-Type"] = contentType;
   }
 
   const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/images`, {
     method: "PUT",
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    body: outgoing,
+    headers,
+    body,
   });
 
   if (!res.ok) {

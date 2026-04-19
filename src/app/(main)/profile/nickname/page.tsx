@@ -125,7 +125,6 @@ export default function NicknamePage() {
             setError("");
           }}
           placeholder="공백 없이 2~20자"
-          error={error}
         />
         <div className="mt-1.5">{statusMessage()}</div>
       </div>

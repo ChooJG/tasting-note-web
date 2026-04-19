@@ -59,22 +59,25 @@ export default function MyNotesPage() {
         {notes && notes.length > 0 && (
           <div className="grid grid-cols-3 gap-[2px] p-[2px]">
             {notes.map((note) => {
-              const icon = "\u{1F377}";
+              const hasImage = note.imageUrls && note.imageUrls.length > 0;
               return (
                 <Link
                   key={note.id}
                   href={`/notes/${note.id}`}
                   className="relative flex aspect-square cursor-pointer items-center justify-center overflow-hidden bg-beige-mid"
                 >
-                  {/* TODO: note.imageUrl이 있으면 이미지 표시 */}
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-[13px] text-rating">
-                      ★ {note.rating?.toFixed(1) ?? "-"}
-                    </span>
-                    <span className="px-1 text-center text-[10px] text-ink-muted">
-                      {note.alcoholNameKo ?? note.alcoholName ?? icon}
-                    </span>
-                  </div>
+                  {hasImage ? (
+                    <img src={note.imageUrls![0]} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-[13px] text-rating">
+                        ★ {note.rating?.toFixed(1) ?? "-"}
+                      </span>
+                      <span className="px-1 text-center text-[10px] text-ink-muted">
+                        {note.alcoholNameKo ?? note.alcoholName}
+                      </span>
+                    </div>
+                  )}
                 </Link>
               );
             })}

@@ -17,20 +17,21 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 const TASTE_SUGGESTIONS = [
-  "\uBC14\uB2D0\uB77C", "\uAF40", "\uCE90\uB7EC\uBA5C", "\uCD08\uCF5C\uB9BF",
-  "\uC2DC\uD2B8\uB7EC\uC2A4", "\uACE4\uACFC\uB958", "\uD53C\uD2B8",
-  "\uB2EC\uCF64", "\uC4C9\uC4C9\uD568", "\uC2A4\uD30C\uC774\uC2DC",
+  "바닐라", "꿀", "캐러멜", "초콜릿",
+  "시트러스", "견과류", "피트",
+  "달콤", "쌉쌀함", "스파이시",
 ];
 
 const AROMA_SUGGESTIONS = [
-  "\uC2A4\uBAA8\uD0A4", "\uC624\uD06C", "\uBC14\uB2D0\uB77C",
-  "\uAF43\uD5A5", "\uACFC\uC77C\uD5A5", "\uD5C8\uBE0C",
-  "\uD53C\uD2B8", "\uAC00\uC8FD", "\uC694\uC624\uB4DC", "\uD1A0\uD53C",
+  "스모키", "오크", "바닐라",
+  "꽃향", "과일향", "허브",
+  "피트", "가죽", "요오드", "토피",
 ];
 
 interface PhotoItem {
-  file: File;
+  file?: File;
   preview: string;
+  isExisting?: boolean;
 }
 
 interface NoteFormProps {
@@ -43,6 +44,7 @@ interface NoteFormProps {
   isSubmitting: boolean;
   defaultValues?: Partial<NoteFormInput>;
   submitLabel?: string;
+  existingImageUrls?: string[];
 }
 
 export default function NoteForm({
@@ -54,10 +56,16 @@ export default function NoteForm({
   onSubmit,
   isSubmitting,
   defaultValues,
-  submitLabel = "\uC800\uC7A5\uD558\uAE30",
+  submitLabel = "저장하기",
+  existingImageUrls,
 }: NoteFormProps) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [photos, setPhotos] = useState<PhotoItem[]>([]);
+  const [photos, setPhotos] = useState<PhotoItem[]>(() => {
+    if (existingImageUrls && existingImageUrls.length > 0) {
+      return existingImageUrls.map((url) => ({ preview: url, isExisting: true }));
+    }
+    return [];
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -163,7 +171,7 @@ export default function NoteForm({
     if (!files) return;
     const remaining = 3 - photos.length;
     const newFiles = Array.from(files).slice(0, remaining);
-    const newPhotos = newFiles.map((file) => ({
+    const newPhotos: PhotoItem[] = newFiles.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
     }));
@@ -173,17 +181,32 @@ export default function NoteForm({
 
   const handlePhotoRemove = (idx: number) => {
     setPhotos((prev) => {
-      URL.revokeObjectURL(prev[idx].preview);
+      if (!prev[idx].isExisting) URL.revokeObjectURL(prev[idx].preview);
       return prev.filter((_, i) => i !== idx);
     });
   };
 
-  const onFormSubmit = (data: NoteFormInput) => {
-    onSubmit(data, photos.map((p) => p.file));
+  const onFormSubmit = async (data: NoteFormInput) => {
+    if (photos.length === 0) {
+      onSubmit(data, []);
+      return;
+    }
+    // 모든 사진을 File로 변환 (기존 URL은 프록시 경유, 새 파일은 그대로)
+    const files: File[] = await Promise.all(
+      photos.map(async (p, i) => {
+        if (p.file) return p.file;
+        // 기존 이미지 URL → 프록시로 가져와서 File 변환
+        const res = await fetch(`/api/proxy-image?url=${encodeURIComponent(p.preview)}`);
+        const blob = await res.blob();
+        const ext = blob.type.split("/")[1] ?? "jpg";
+        return new File([blob], `existing_${i}.${ext}`, { type: blob.type });
+      })
+    );
+    onSubmit(data, files);
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col pb-6">
+    <form onSubmit={handleSubmit(onFormSubmit, (errors) => console.log("Form validation errors:", errors))} className="flex flex-col pb-6">
       {/* ── 술 선택 ── */}
       <div className="px-5">
         <h3 className="mb-2.5 mt-5 text-[12px] font-medium uppercase tracking-[0.1em] text-ink-muted">
@@ -265,16 +288,15 @@ export default function NoteForm({
 
       <div className="my-4 h-2 bg-beige-mid" />
 
-      {/* ── 제목 (살짝 강조) ── */}
+      {/* ── 제목 ── */}
       <div className="px-5">
         <h3 className="mb-2 text-[12px] font-medium uppercase tracking-[0.1em] text-ink-muted">
           제목
         </h3>
-        <input
+        <Input
           {...register("title")}
           placeholder="이 술을 한 마디로 표현하면?"
           maxLength={100}
-          className="w-full rounded-[12px] border-[1.5px] border-beige-dark bg-white px-4 py-3.5 text-[17px] font-medium tracking-[-0.02em] text-ink placeholder:font-light placeholder:text-ink-muted focus:border-wine-light focus:outline-none"
         />
       </div>
 

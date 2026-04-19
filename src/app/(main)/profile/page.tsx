@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
 import { useMyNotes } from "@/hooks/useNotes";
 import { toast } from "@/components/ui/Toast";
+import { uploadProfileImage } from "@/lib/uploadImage";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -33,21 +34,15 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await fetch("/api/auth/me/profile-image", {
+      const data = await uploadProfileImage(file);
+      setAuth({ isLoggedIn: true, nickname, profileImageUrl: data.profileImageUrl });
+      await fetch("/api/auth/me/profile-image", {
         method: "PATCH",
-        body: formData,
-      });
-      const data = await res.json();
-      if (res.ok && data.profileImageUrl) {
-        setAuth({ isLoggedIn: true, nickname, profileImageUrl: data.profileImageUrl });
-        toast("\uD504\uB85C\uD544 \uC774\uBBF8\uC9C0\uAC00 \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4");
-      } else {
-        toast(data.message ?? "\uC774\uBBF8\uC9C0 \uC5C5\uB85C\uB4DC\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4");
-      }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileImageUrl: data.profileImageUrl }),
+      }).catch(() => {});
+      toast("\uD504\uB85C\uD544 \uC774\uBBF8\uC9C0\uAC00 \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4");
     } catch {
       toast("\uB124\uD2B8\uC6CC\uD06C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4");
     }

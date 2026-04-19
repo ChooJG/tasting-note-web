@@ -9,7 +9,13 @@
       "WebFetch(domain:iconscout.com)",
       "Bash(curl -s -o /Users/choo/VisualProjects/sip-app/public/cat.json \"https://lottie.host/b60e6cf0-2bcc-4993-a498-4b7a69480fa0/BStMf97gRC.json\")",
       "Bash(curl -s -o /Users/choo/VisualProjects/sip-app/public/cat.json \"https://assets2.lottiefiles.com/packages/lf20_OT15QW.json\")",
-      "Bash(python3 -c \"import json; d=json.load\\(open\\('/Users/choo/VisualProjects/sip-app/public/cat.json'\\)\\); print\\('name:', d.get\\('nm','?'\\)\\); print\\('layers:', len\\(d.get\\('layers',[]\\)\\)\\); print\\('size:', d.get\\('w'\\), 'x', d.get\\('h'\\)\\)\")"
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('/Users/choo/VisualProjects/sip-app/public/cat.json'\\)\\); print\\('name:', d.get\\('nm','?'\\)\\); print\\('layers:', len\\(d.get\\('layers',[]\\)\\)\\); print\\('size:', d.get\\('w'\\), 'x', d.get\\('h'\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/cat.json)",
+      "Read(//Users/choo/VisualProjects/**)",
+      "Bash(cat /Users/choo/VisualProjects/pple-office/next.config.*)",
+      "Bash(npx next:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X PUT \"http://localhost:3000/upload/notes/10/images\" -H \"Authorization: Bearer test\")",
+      "Bash(python3 -c \"print\\('\\\\uAF43\\\\uD5A5'\\); print\\('\\\\uAF40'\\)\")"
     ],
     "additionalDirectories": [
       "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]",

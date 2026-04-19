@@ -2,10 +2,13 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNote } from "@/hooks/useNotes";
 import { useUpdateNote } from "@/hooks/useUpdateNote";
 import { usePublishNote } from "@/hooks/useNoteMutations";
+import { toast } from "@/components/ui/Toast";
 import NoteForm from "@/components/notes/NoteForm";
+import { uploadNoteImages } from "@/lib/uploadImage";
 import AlcoholSearch from "@/components/notes/AlcoholSearch";
 import type { AlcoholSelection } from "@/components/notes/AlcoholSearch";
 import Button from "@/components/ui/Button";
@@ -23,6 +26,7 @@ export default function EditNotePage({
   const noteId = Number(id);
   const router = useRouter();
 
+  const queryClient = useQueryClient();
   const { data: note, isLoading } = useNote(noteId);
   const updateNote = useUpdateNote(noteId);
   const publishNote = usePublishNote();
@@ -71,13 +75,11 @@ export default function EditNotePage({
       {
         onSuccess: async () => {
           if (photos.length > 0) {
-            const formData = new FormData();
-            photos.forEach((file) => formData.append("images", file));
-            await fetch(`/api/notes/${noteId}/images`, {
-              method: "PUT",
-              body: formData,
-            });
+            await uploadNoteImages(noteId, photos).catch(() => {});
           }
+          await queryClient.invalidateQueries({ queryKey: ["notes"] });
+          toast("수정되었습니다");
+          router.push(`/notes/${noteId}`);
         },
       }
     );
@@ -136,6 +138,7 @@ export default function EditNotePage({
           onSubmit={handleSubmit}
           isSubmitting={updateNote.isPending}
           submitLabel="저장"
+          existingImageUrls={note.imageUrls}
           defaultValues={{
             alcoholId: note.alcoholId,
             title: note.title ?? "",

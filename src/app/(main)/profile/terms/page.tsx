@@ -55,10 +55,12 @@ function RunawayButton({ onCatch }: { onCatch: () => void }) {
 
   const getMessage = () => {
     if (attempts === 0) return "버튼을 눌러 동의해주세요";
-    if (attempts < 5) return `시도 ${attempts}회... 20번을 목표로`;
-    if (attempts < 10) return `시도 ${attempts}회... 제법인데요?`;
+    if (attempts < 5) return `시도 ${attempts}회... 20번을 클릭해보세요!`;
+    if (attempts < 10)
+      return `시도 ${attempts}회... 하란다고 진짜로 하고있네요`;
     if (attempts < 15) return `시도 ${attempts}회... 시간이 많으신가요?`;
-    if (attempts < 20) return `시도 ${attempts}회... 현실에는 이런 쓸데없는 일 말고 생산적인 일이 많이 남아있답니다`;
+    if (attempts < 20)
+      return `시도 ${attempts}회... 현실에는 이런 쓸데없는 일 말고 생산적인 일이 많이 남아있답니다`;
     return `시도 ${attempts}회...`;
   };
 
@@ -109,7 +111,9 @@ function AchievementBanner() {
 
   return (
     <div
-      className={`flex flex-col items-center gap-5 transition-all duration-700 ${show ? "scale-100 opacity-100" : "scale-75 opacity-0"}`}
+      className={`flex flex-col items-center gap-5 transition-all duration-700 ${
+        show ? "scale-100 opacity-100" : "scale-75 opacity-0"
+      }`}
     >
       {/* 도전과제 카드 */}
       <div className="w-full max-w-[300px] overflow-hidden rounded-[16px] bg-[#1a1a2e] shadow-[0_0_40px_rgba(123,45,45,0.3)]">
@@ -127,7 +131,9 @@ function AchievementBanner() {
           </div>
           <div className="text-center">
             <p className="text-[18px] font-bold text-beige">너가 이겼다...</p>
-            <p className="mt-1 text-[12px] text-beige/50">이용약관 동의 마스터</p>
+            <p className="mt-1 text-[12px] text-beige/50">
+              이용약관 동의 마스터
+            </p>
           </div>
           <div className="mt-1 rounded-pill bg-white/10 px-3 py-1">
             <p className="text-[11px] text-beige/60">0.1%의 유저만 달성</p>
@@ -147,12 +153,26 @@ export default function TermsPage() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="flex shrink-0 items-center border-b border-beige-dark px-5 pb-3 pt-4">
-        <button onClick={() => router.back()} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70">
-          <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+        <button
+          onClick={() => router.back()}
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70"
+        >
+          <svg
+            width={18}
+            height={18}
+            viewBox="0 0 18 18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M11 4L6 9L11 14" />
           </svg>
         </button>
-        <span className="flex-1 text-center text-[16px] font-semibold text-ink">이용약관</span>
+        <span className="flex-1 text-center text-[16px] font-semibold text-ink">
+          이용약관
+        </span>
         <div className="w-9" />
       </header>
 

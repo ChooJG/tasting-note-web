@@ -11,7 +11,7 @@ export default function Loading() {
             className="absolute inset-0 h-10 w-10"
           >
             <path
-              d="M18 4C18 4 8 15 8 23C8 28.5228 12.4772 33 18 33C23.5228 33 28 28.5228 28 23C28 15 18 4"
+              d="M18 4S8 15 8 23A10 10 0 0 0 28 23C28 15 18 4 18 4Z"
               stroke="#7B2D2D"
               strokeWidth="2.5"
               strokeLinecap="round"
