@@ -177,9 +177,16 @@ export default function NoteDetailPage({
               {note.rating?.toFixed(1)}
             </span>
           </div>
-          <p className="text-[13px] text-ink-muted">
-            {note.nickname ?? `유저 #${note.userId}`} · {formatDate(note.drankAt ?? note.createdAt)}
-          </p>
+          <div className="flex items-center gap-2 text-[13px] text-ink-muted">
+            {note.profileImageUrl ? (
+              <img src={note.profileImageUrl} alt="" className="h-6 w-6 rounded-full object-cover" />
+            ) : (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-wine text-[10px] font-semibold text-beige">
+                {(note.nickname ?? "?").charAt(0)}
+              </div>
+            )}
+            <span>{note.nickname ?? `유저 #${note.userId}`} · {formatDate(note.drankAt ?? note.createdAt)}</span>
+          </div>
         </div>
 
         {/* Taste */}

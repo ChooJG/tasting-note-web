@@ -11,6 +11,7 @@ export interface components {
       /** Format: int64 */
       userId?: number;
       nickname?: string;
+      profileImageUrl?: string;
       /** Format: int64 */
       alcoholId?: number;
       alcoholName?: string;

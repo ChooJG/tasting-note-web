@@ -112,9 +112,18 @@ export default function NoteCard({
               {STATUS_LABELS[note.status]}
             </span>
           ) : showAuthor ? (
-            <span className="text-[12px] text-ink-muted">
-              {note.nickname ?? `유저 #${note.userId}`}
-            </span>
+            <div className="flex items-center gap-1.5">
+              {note.profileImageUrl ? (
+                <img src={note.profileImageUrl} alt="" className="h-5 w-5 rounded-full object-cover" />
+              ) : (
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-wine text-[9px] font-semibold text-beige">
+                  {(note.nickname ?? "?").charAt(0)}
+                </div>
+              )}
+              <span className="text-[12px] text-ink-muted">
+                {note.nickname ?? `유저 #${note.userId}`}
+              </span>
+            </div>
           ) : null}
         </div>
 
