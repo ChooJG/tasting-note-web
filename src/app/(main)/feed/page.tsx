@@ -59,13 +59,13 @@ export default function FeedPage() {
             피드를 불러올 수 없습니다.
           </div>
         )}
-        {notes && notes.length === 0 && (
+        {notes && notes.content.length === 0 && (
           <div className="flex justify-center py-20 text-[14px] text-ink-muted">
             아직 공개된 노트가 없습니다.
           </div>
         )}
         <div className="flex flex-col gap-3">
-          {notes?.map((note) => (
+          {notes?.content.map((note) => (
             <NoteCard key={note.id} note={note} showAuthor />
           ))}
         </div>
