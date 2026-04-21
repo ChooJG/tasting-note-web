@@ -19,12 +19,16 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
-export async function getAlcoholsByCategory(category: AlcoholCategory): Promise<PagedAlcoholResponse> {
-  const res = await fetch(`/api/alcohols?category=${category}`);
+export async function getAlcoholsByCategory(category: AlcoholCategory, cursor?: string): Promise<PagedAlcoholResponse> {
+  const params = new URLSearchParams({ category });
+  if (cursor) params.set("cursor", cursor);
+  const res = await fetch(`/api/alcohols?${params}`);
   return handleResponse(res);
 }
 
-export async function searchAlcohols(keyword: string): Promise<PagedAlcoholResponse> {
-  const res = await fetch(`/api/alcohols?keyword=${encodeURIComponent(keyword)}`);
+export async function searchAlcohols(keyword: string, cursor?: string): Promise<PagedAlcoholResponse> {
+  const params = new URLSearchParams({ keyword });
+  if (cursor) params.set("cursor", cursor);
+  const res = await fetch(`/api/alcohols?${params}`);
   return handleResponse(res);
 }
