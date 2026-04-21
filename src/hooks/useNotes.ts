@@ -1,13 +1,15 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getPublicNotes, getMyNotes, getNote } from "@/api/notes";
 import { useAuthStore } from "@/store/auth";
 
 export function usePublicNotes() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["notes", "public"],
-    queryFn: getPublicNotes,
+    queryFn: ({ pageParam }) => getPublicNotes(pageParam as string | undefined),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.nextCursor : undefined,
   });
 }
 

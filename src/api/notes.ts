@@ -23,8 +23,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
-export async function getPublicNotes(): Promise<PagedNoteResponse> {
-  const res = await fetch("/api/notes/public");
+export async function getPublicNotes(cursor?: string, size = 20): Promise<PagedNoteResponse> {
+  const params = new URLSearchParams({ size: String(size) });
+  if (cursor) params.set("cursor", cursor);
+  const res = await fetch(`/api/notes/public?${params}`);
   return handleResponse(res);
 }
 
