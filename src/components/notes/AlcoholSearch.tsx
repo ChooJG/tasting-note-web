@@ -53,7 +53,8 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
   );
 
   const isSearching = debouncedKeyword.length >= 1;
-  const alcohols = isSearching ? searchQuery.data : categoryQuery.data;
+  const queryData = isSearching ? searchQuery.data : categoryQuery.data;
+  const alcohols = queryData?.content;
   const isLoading = isSearching ? searchQuery.isLoading : categoryQuery.isLoading;
   const noResults = isSearching && !isLoading && alcohols && alcohols.length === 0;
 

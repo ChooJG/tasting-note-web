@@ -3,6 +3,12 @@ import type { components } from "@/types/api";
 type AlcoholResponse = components["schemas"]["AlcoholResponse"];
 type AlcoholCategory = NonNullable<AlcoholResponse["category"]>;
 
+export type PagedAlcoholResponse = {
+  content: AlcoholResponse[];
+  hasNext: boolean;
+  nextCursor?: string;
+};
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const text = await res.text();
@@ -13,12 +19,12 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
-export async function getAlcoholsByCategory(category: AlcoholCategory): Promise<AlcoholResponse[]> {
+export async function getAlcoholsByCategory(category: AlcoholCategory): Promise<PagedAlcoholResponse> {
   const res = await fetch(`/api/alcohols?category=${category}`);
   return handleResponse(res);
 }
 
-export async function searchAlcohols(keyword: string): Promise<AlcoholResponse[]> {
+export async function searchAlcohols(keyword: string): Promise<PagedAlcoholResponse> {
   const res = await fetch(`/api/alcohols?keyword=${encodeURIComponent(keyword)}`);
   return handleResponse(res);
 }
