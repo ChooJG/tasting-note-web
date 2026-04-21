@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAlcoholsByCategory, useAlcoholSearch } from "@/hooks/useAlcohols";
 import type { components } from "@/types/api";
 
@@ -52,11 +52,24 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
     debouncedKeyword ? null : selectedCategory
   );
 
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
   const isSearching = debouncedKeyword.length >= 1;
-  const queryData = isSearching ? searchQuery.data : categoryQuery.data;
-  const alcohols = queryData?.content;
-  const isLoading = isSearching ? searchQuery.isLoading : categoryQuery.isLoading;
-  const noResults = isSearching && !isLoading && alcohols && alcohols.length === 0;
+  const activeQuery = isSearching ? searchQuery : categoryQuery;
+  const alcohols = activeQuery.data?.pages.flatMap((p) => p.content) ?? [];
+  const isLoading = activeQuery.isLoading;
+  const { fetchNextPage, hasNextPage, isFetchingNextPage } = activeQuery;
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting && hasNextPage) fetchNextPage(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -120,7 +133,7 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
             검색 중...
           </div>
         )}
-        {alcohols?.map((alc) => (
+        {alcohols.map((alc) => (
           <button
             key={alc.id}
             onClick={() => onSelect({ type: "search", alcohol: alc })}
@@ -163,9 +176,15 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
           </button>
         )}
 
-        {!isSearching && alcohols && alcohols.length === 0 && (
+        {!isSearching && alcohols.length === 0 && !isLoading && (
           <div className="py-16 text-center text-[14px] text-ink-muted">
             카테고리를 선택하세요
+          </div>
+        )}
+        <div ref={sentinelRef} className="h-1" />
+        {isFetchingNextPage && (
+          <div className="py-4 text-center text-[14px] text-ink-muted">
+            불러오는 중...
           </div>
         )}
       </div>
