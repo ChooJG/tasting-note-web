@@ -49,16 +49,16 @@ export default function MyNotesPage() {
             불러오는 중...
           </div>
         )}
-        {notes && notes.length === 0 && (
+        {notes && notes.content.length === 0 && (
           <div className="py-20 text-center text-[14px] text-ink-muted">
             {filter === "DRAFT"
               ? "임시저장된 노트가 없습니다."
               : "발행된 노트가 없습니다."}
           </div>
         )}
-        {notes && notes.length > 0 && (
+        {notes && notes.content.length > 0 && (
           <div className="grid grid-cols-3 gap-[2px] p-[2px]">
-            {notes.map((note) => {
+            {notes.content.map((note) => {
               const hasImage = note.imageUrls && note.imageUrls.length > 0;
               return (
                 <Link
