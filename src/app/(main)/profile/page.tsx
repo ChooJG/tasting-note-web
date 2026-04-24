@@ -20,7 +20,7 @@ export default function ProfilePage() {
   const { data: allNotes } = useMyNotes();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const publishedCount = allNotes?.filter((n) => n.status === "PUBLISHED").length ?? 0;
+  const publishedCount = allNotes?.content.filter((n) => n.status === "PUBLISHED").length ?? 0;
 
   const displayName = nickname ?? "\uC0AC\uC6A9\uC790";
   const initial = displayName.charAt(0);
