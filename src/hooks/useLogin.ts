@@ -34,11 +34,9 @@ export function useLogin() {
         return;
       }
 
-      setAuth({
-        isLoggedIn: true,
-        userId: json.userId ?? null,
-        nickname: json.nickname ?? null,
-      });
+      const meRes = await fetch("/api/auth/me");
+      const meData = await meRes.json();
+      setAuth(meData);
       router.push(callbackUrl);
     } catch {
       toast("네트워크 오류가 발생했습니다.");

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMyNotes } from "@/hooks/useNotes";
+import { useAuthStore } from "@/store/auth";
 
 type StatusFilter = "PUBLISHED" | "DRAFT";
 
@@ -13,8 +15,16 @@ const TABS: { label: string; value: StatusFilter }[] = [
 
 
 export default function MyNotesPage() {
+  const router = useRouter();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const [filter, setFilter] = useState<StatusFilter>("PUBLISHED");
   const { data: notes, isLoading } = useMyNotes(filter);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.replace("/login?callbackUrl=/notes");
+    }
+  }, [isLoggedIn, router]);
 
   return (
     <>

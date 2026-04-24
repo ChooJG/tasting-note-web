@@ -19,13 +19,15 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export async function getPublicNotes(): Promise<NoteResponse[]> {
   const res = await fetch("/api/notes/public");
-  return handleResponse(res);
+  const data = await handleResponse<{ content: NoteResponse[] } | NoteResponse[]>(res);
+  return Array.isArray(data) ? data : data.content ?? [];
 }
 
 export async function getMyNotes(status?: "DRAFT" | "PUBLISHED"): Promise<NoteResponse[]> {
   const params = status ? `?status=${status}` : "";
   const res = await fetch(`/api/notes${params}`);
-  return handleResponse(res);
+  const data = await handleResponse<{ content: NoteResponse[] } | NoteResponse[]>(res);
+  return Array.isArray(data) ? data : data.content ?? [];
 }
 
 export async function getNote(noteId: number): Promise<NoteResponse> {
