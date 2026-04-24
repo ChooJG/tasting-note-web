@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/useLogin";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import SipLogo from "@/components/ui/SipLogo";
 
 export default function LoginPage() {
+  const router = useRouter();
   const { form, onSubmit, isLoading } = useLogin();
   const {
     register,
@@ -29,8 +31,27 @@ export default function LoginPage() {
         />
 
         <div className="relative">
-          <div className="mb-10">
+          <div className="mb-10 flex items-start justify-between">
             <SipLogo variant="light" size={36} />
+            <button
+              onClick={() => router.push("/feed")}
+              aria-label="피드로 돌아가기"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-beige/70 transition-colors hover:bg-beige/10 hover:text-beige"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5M12 5l-7 7 7 7" />
+              </svg>
+            </button>
           </div>
 
           <h2 className="text-[28px] font-normal leading-[1.3] tracking-[-0.02em] text-beige/95">
