@@ -4,6 +4,12 @@ type NoteResponse = components["schemas"]["NoteResponse"];
 type NoteCreateRequest = components["schemas"]["NoteCreateRequest"];
 type NoteUpdateRequest = components["schemas"]["NoteUpdateRequest"];
 
+export type PagedNoteResponse = {
+  content: NoteResponse[];
+  hasNext: boolean;
+  nextCursor?: string;
+};
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const text = await res.text();
@@ -17,17 +23,17 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
-export async function getPublicNotes(): Promise<NoteResponse[]> {
-  const res = await fetch("/api/notes/public");
-  const data = await handleResponse<{ content: NoteResponse[] }>(res);
-  return data.content ?? [];
+export async function getPublicNotes(cursor?: string, size = 20): Promise<PagedNoteResponse> {
+  const params = new URLSearchParams({ size: String(size) });
+  if (cursor) params.set("cursor", cursor);
+  const res = await fetch(`/api/notes/public?${params}`);
+  return handleResponse(res);
 }
 
-export async function getMyNotes(status?: "DRAFT" | "PUBLISHED"): Promise<NoteResponse[]> {
+export async function getMyNotes(status?: "DRAFT" | "PUBLISHED"): Promise<PagedNoteResponse> {
   const params = status ? `?status=${status}` : "";
   const res = await fetch(`/api/notes${params}`);
-  const data = await handleResponse<{ content: NoteResponse[] }>(res);
-  return data.content ?? [];
+  return handleResponse(res);
 }
 
 export async function getNote(noteId: number): Promise<NoteResponse> {

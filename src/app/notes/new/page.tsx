@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCreateNote } from "@/hooks/useCreateNote";
 import { toast } from "@/components/ui/Toast";
 import { uploadNoteImages } from "@/lib/uploadImage";
+import { useAuthStore } from "@/store/auth";
 import AlcoholSearch from "@/components/notes/AlcoholSearch";
 import type { AlcoholSelection } from "@/components/notes/AlcoholSearch";
 import NoteForm from "@/components/notes/NoteForm";
@@ -16,7 +17,15 @@ type AlcoholResponse = components["schemas"]["AlcoholResponse"];
 
 export default function NewNotePage() {
   const router = useRouter();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const [pickingAlcohol, setPickingAlcohol] = useState(false);
+
+  useEffect(() => {
+    if (hasHydrated && !isLoggedIn) {
+      router.replace("/login?callbackUrl=/notes/new");
+    }
+  }, [hasHydrated, isLoggedIn, router]);
   const [selectedAlcohol, setSelectedAlcohol] = useState<AlcoholResponse | null>(null);
   const [customAlcoholName, setCustomAlcoholName] = useState("");
   const queryClient = useQueryClient();

@@ -13,11 +13,13 @@ export async function POST(req: NextRequest) {
   });
 
   const data = await res.json();
+  console.log("[login] status:", res.status, "data:", JSON.stringify(data));
+  console.log("[login] headers:", Object.fromEntries(res.headers.entries()));
 
-  if (!res.ok) {
+  if (!res.ok || data.success === false) {
     return NextResponse.json(
       { success: false, message: data.message ?? "로그인에 실패했습니다." },
-      { status: res.status }
+      { status: res.ok ? 401 : res.status }
     );
   }
 

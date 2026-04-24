@@ -6,6 +6,7 @@ interface AuthState {
   userId: number | null;
   nickname: string | null;
   profileImageUrl: string | null;
+  _hasHydrated: boolean;
   setAuth: (data: {
     isLoggedIn: boolean;
     userId?: number | null;
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthState>()(
       userId: null,
       nickname: null,
       profileImageUrl: null,
+      _hasHydrated: false,
       setAuth: ({ isLoggedIn, userId, nickname, profileImageUrl }) =>
         set((prev) => ({
           isLoggedIn,
@@ -34,6 +36,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "sip-auth",
+      onRehydrateStorage: () => () => {
+        useAuthStore.setState({ _hasHydrated: true });
+      },
     }
   )
 );

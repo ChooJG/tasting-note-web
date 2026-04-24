@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { usePublicNotes } from "@/hooks/useNotes";
 import { useAuthStore } from "@/store/auth";
 import NoteCard from "@/components/notes/NoteCard";
@@ -43,7 +44,21 @@ function FeedHeader() {
 }
 
 export default function FeedPage() {
-  const { data: notes, isLoading, error } = usePublicNotes();
+  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = usePublicNotes();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting && hasNextPage) fetchNextPage(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
+  const notes = data?.pages.flatMap((p) => p.content) ?? [];
 
   return (
     <>
@@ -59,16 +74,22 @@ export default function FeedPage() {
             피드를 불러올 수 없습니다.
           </div>
         )}
-        {notes && notes.length === 0 && (
+        {!isLoading && notes.length === 0 && (
           <div className="flex justify-center py-20 text-[14px] text-ink-muted">
             아직 공개된 노트가 없습니다.
           </div>
         )}
         <div className="flex flex-col gap-3">
-          {notes?.map((note) => (
+          {notes.map((note) => (
             <NoteCard key={note.id} note={note} showAuthor />
           ))}
         </div>
+        <div ref={sentinelRef} className="h-1" />
+        {isFetchingNextPage && (
+          <div className="py-4 text-center text-[14px] text-ink-muted">
+            불러오는 중...
+          </div>
+        )}
       </div>
     </>
   );

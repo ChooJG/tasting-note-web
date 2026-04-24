@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMyNotes } from "@/hooks/useNotes";
+import { useAuthStore } from "@/store/auth";
 
 type StatusFilter = "PUBLISHED" | "DRAFT";
 
@@ -13,8 +15,17 @@ const TABS: { label: string; value: StatusFilter }[] = [
 
 
 export default function MyNotesPage() {
+  const router = useRouter();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const [filter, setFilter] = useState<StatusFilter>("PUBLISHED");
   const { data: notes, isLoading } = useMyNotes(filter);
+
+  useEffect(() => {
+    if (hasHydrated && !isLoggedIn) {
+      router.replace("/login?callbackUrl=/notes");
+    }
+  }, [hasHydrated, isLoggedIn, router]);
 
   return (
     <>
@@ -49,16 +60,16 @@ export default function MyNotesPage() {
             불러오는 중...
           </div>
         )}
-        {notes && notes.length === 0 && (
+        {notes && notes.content.length === 0 && (
           <div className="py-20 text-center text-[14px] text-ink-muted">
             {filter === "DRAFT"
               ? "임시저장된 노트가 없습니다."
               : "발행된 노트가 없습니다."}
           </div>
         )}
-        {notes && notes.length > 0 && (
+        {notes && notes.content.length > 0 && (
           <div className="grid grid-cols-3 gap-[2px] p-[2px]">
-            {notes.map((note) => {
+            {notes.content.map((note) => {
               const hasImage = note.imageUrls && note.imageUrls.length > 0;
               return (
                 <Link

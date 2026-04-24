@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
@@ -10,11 +10,17 @@ import { uploadProfileImage } from "@/lib/uploadImage";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { nickname, profileImageUrl, setAuth, clearAuth } = useAuthStore();
+  const { nickname, profileImageUrl, isLoggedIn, _hasHydrated, setAuth, clearAuth } = useAuthStore();
+
+  useEffect(() => {
+    if (_hasHydrated && !isLoggedIn) {
+      router.replace("/login?callbackUrl=/profile");
+    }
+  }, [_hasHydrated, isLoggedIn, router]);
   const { data: allNotes } = useMyNotes();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const publishedCount = allNotes?.filter((n) => n.status === "PUBLISHED").length ?? 0;
+  const publishedCount = allNotes?.content.filter((n) => n.status === "PUBLISHED").length ?? 0;
 
   const displayName = nickname ?? "\uC0AC\uC6A9\uC790";
   const initial = displayName.charAt(0);
@@ -23,7 +29,7 @@ export default function ProfilePage() {
     await fetch("/api/auth/logout", { method: "POST" });
     clearAuth();
     toast("\uB85C\uADF8\uC544\uC6C3 \uB418\uC5C8\uC2B5\uB2C8\uB2E4");
-    router.push("/feed");
+    window.location.href = "/feed";
   };
 
   const handleProfileImageClick = () => {
