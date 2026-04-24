@@ -5,6 +5,7 @@ const PUBLIC_PATHS = [
   "/feed",
   "/login",
   "/signup",
+  "/oauth/callback",
   "/explore",
   "/profile/privacy",
   "/profile/terms",
