@@ -20,12 +20,20 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     syncAuth();
 
-    // bfcache에서 복원될 때 auth 재동기화 + 멈춘 쿼리 재실행
+    // bfcache에서 복원될 때: auth 상태가 바뀌었으면 reload, 아니면 멈춘 쿼리만 재실행
     const handlePageShow = (e: PageTransitionEvent) => {
-      if (e.persisted) {
-        syncAuth();
-        queryClient.refetchQueries({ type: "active" });
-      }
+      if (!e.persisted) return;
+      try {
+        const stored = localStorage.getItem("sip-auth");
+        const parsed = stored ? JSON.parse(stored) : null;
+        const storedIsLoggedIn = parsed?.state?.isLoggedIn ?? false;
+        const frozenIsLoggedIn = useAuthStore.getState().isLoggedIn;
+        if (storedIsLoggedIn !== frozenIsLoggedIn) {
+          window.location.reload();
+          return;
+        }
+      } catch {}
+      queryClient.refetchQueries({ type: "active" });
     };
 
     window.addEventListener("pageshow", handlePageShow);

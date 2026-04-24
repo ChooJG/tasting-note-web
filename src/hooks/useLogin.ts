@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
@@ -9,7 +9,6 @@ import { useAuthStore } from "@/store/auth";
 import { toast } from "@/components/ui/Toast";
 
 export function useLogin() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/feed";
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -37,7 +36,7 @@ export function useLogin() {
       const meRes = await fetch("/api/auth/me");
       const meData = await meRes.json();
       setAuth(meData);
-      router.replace(callbackUrl);
+      window.location.replace(callbackUrl);
     } catch {
       toast("네트워크 오류가 발생했습니다.");
     } finally {
