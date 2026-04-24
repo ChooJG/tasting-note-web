@@ -18,13 +18,14 @@ type AlcoholResponse = components["schemas"]["AlcoholResponse"];
 export default function NewNotePage() {
   const router = useRouter();
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const [pickingAlcohol, setPickingAlcohol] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (hasHydrated && !isLoggedIn) {
       router.replace("/login?callbackUrl=/notes/new");
     }
-  }, [isLoggedIn, router]);
+  }, [hasHydrated, isLoggedIn, router]);
   const [selectedAlcohol, setSelectedAlcohol] = useState<AlcoholResponse | null>(null);
   const [customAlcoholName, setCustomAlcoholName] = useState("");
   const queryClient = useQueryClient();

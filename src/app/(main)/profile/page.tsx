@@ -10,13 +10,13 @@ import { uploadProfileImage } from "@/lib/uploadImage";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { nickname, profileImageUrl, isLoggedIn, setAuth, clearAuth } = useAuthStore();
+  const { nickname, profileImageUrl, isLoggedIn, _hasHydrated, setAuth, clearAuth } = useAuthStore();
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (_hasHydrated && !isLoggedIn) {
       router.replace("/login?callbackUrl=/profile");
     }
-  }, [isLoggedIn, router]);
+  }, [_hasHydrated, isLoggedIn, router]);
   const { data: allNotes } = useMyNotes();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
