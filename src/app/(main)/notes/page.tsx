@@ -17,14 +17,15 @@ const TABS: { label: string; value: StatusFilter }[] = [
 export default function MyNotesPage() {
   const router = useRouter();
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
   const [filter, setFilter] = useState<StatusFilter>("PUBLISHED");
   const { data: notes, isLoading } = useMyNotes(filter);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (hasHydrated && !isLoggedIn) {
       router.replace("/login?callbackUrl=/notes");
     }
-  }, [isLoggedIn, router]);
+  }, [hasHydrated, isLoggedIn, router]);
 
   return (
     <>
