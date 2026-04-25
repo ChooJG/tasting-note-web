@@ -17,7 +17,12 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X PUT \"http://localhost:3000/upload/notes/10/images\" -H \"Authorization: Bearer test\")",
       "Bash(python3 -c \"print\\('\\\\uAF43\\\\uD5A5'\\); print\\('\\\\uAF40'\\)\")",
       "Bash(curl -s -X POST https://api.myfirstsbproject.shop/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"test@test.com\",\"password\":\"test1234\"}')",
-      "Bash(python3 -c \"import sys,json; t=json.load\\(sys.stdin\\); print\\(t.get\\('accessToken',''\\)[:50]\\)\")"
+      "Bash(python3 -c \"import sys,json; t=json.load\\(sys.stdin\\); print\\(t.get\\('accessToken',''\\)[:50]\\)\")",
+      "Bash(ls /Users/choo/VisualProjects/sip-app/public/preview-image*)",
+      "Bash(sips -z 630 1200 /Users/choo/VisualProjects/sip-app/public/preview-image.png -s format png --out /Users/choo/VisualProjects/sip-app/public/preview-image-og.png)",
+      "Bash(sips -s format jpeg -s formatOptions 80 /Users/choo/VisualProjects/sip-app/public/preview-image-og.png --out /Users/choo/VisualProjects/sip-app/public/preview-image-og.jpg)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{redirect_url}\" http://localhost:3000/profile)",
+      "Bash(git status:*)"
     ],
     "additionalDirectories": [
       "/Users/choo/VisualProjects/sip-app/src/app/notes/[id]",

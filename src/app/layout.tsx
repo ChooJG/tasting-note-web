@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "./providers";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://casknote.site";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Tasting Note",
   description: "나만의 술 테이스팅 경험을 기록하고 공유하세요",
   openGraph: {
