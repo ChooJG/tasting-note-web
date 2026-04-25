@@ -110,30 +110,30 @@ function LoginForm() {
           <div className="h-px flex-1 bg-ink/10" />
         </div>
 
-        <div className="mt-5 flex flex-col gap-3">
+        <div className="mt-5 flex items-center justify-center gap-4">
           <a
             href={getKakaoUrl()}
-            className="flex h-12 items-center justify-center gap-2.5 rounded-xl bg-[#FEE500] text-[14px] font-medium text-[#191919]"
+            aria-label="카카오로 로그인"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FEE500]"
           >
             <KakaoIcon />
-            카카오로 로그인
           </a>
 
           <a
             href={getGoogleUrl()}
-            className="flex h-12 items-center justify-center gap-2.5 rounded-xl border border-ink/10 bg-white text-[14px] font-medium text-ink"
+            aria-label="구글로 로그인"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 bg-white"
           >
             <GoogleIcon />
-            구글로 로그인
           </a>
 
           <button
             type="button"
             onClick={() => { window.location.href = getNaverUrl(); }}
-            className="flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[#03C75A] text-[14px] font-medium text-white"
+            aria-label="네이버로 로그인"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#03C75A]"
           >
             <NaverIcon />
-            네이버로 로그인
           </button>
         </div>
       </div>
