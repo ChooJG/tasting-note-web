@@ -95,7 +95,7 @@ export default function NewNotePage() {
       {/* Header */}
       <header className="flex shrink-0 items-center border-b border-beige-dark px-5 pb-3 pt-4">
         <button
-          onClick={() => router.back()}
+          onClick={() => window.location.replace("/feed")}
           className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/70"
         >
           <svg width={14} height={14} viewBox="0 0 14 14" fill="none">

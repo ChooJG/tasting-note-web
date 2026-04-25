@@ -10,6 +10,7 @@ export function usePublicNotes() {
     queryFn: ({ pageParam }) => getPublicNotes(pageParam as string | undefined),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.nextCursor : undefined,
+    refetchOnMount: "always",
   });
 }
 
