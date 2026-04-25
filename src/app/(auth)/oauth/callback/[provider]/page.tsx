@@ -2,12 +2,14 @@
 
 import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useAuthStore } from "@/store/auth";
 
 function OAuthCallback() {
   const router = useRouter();
   const params = useParams<{ provider: string }>();
   const searchParams = useSearchParams();
   const called = useRef(false);
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   useEffect(() => {
     if (called.current) return;
@@ -29,16 +31,21 @@ function OAuthCallback() {
       body: JSON.stringify({ code, redirectUri }),
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         if (!data.success) {
           const msg = encodeURIComponent(data.message ?? "소셜 로그인에 실패했습니다.");
           router.replace(`/login?error=${msg}`);
           return;
         }
+
+        const meRes = await fetch("/api/auth/me");
+        const meData = await meRes.json();
+        setAuth(meData);
+
         if (data.isNewUser) {
           router.replace("/signup/profile");
         } else {
-          router.replace("/");
+          window.location.replace("/feed");
         }
       })
       .catch(() => {
