@@ -17,12 +17,14 @@ export async function GET() {
       // 세션에도 저장
       if (user.nickname) session.nickname = user.nickname;
       if (user.profileImageUrl) session.profileImageUrl = user.profileImageUrl;
+      if (user.email) session.email = user.email;
       await session.save();
 
       return NextResponse.json({
         isLoggedIn: true,
         userId: session.userId ?? null,
         nickname: user.nickname ?? session.nickname ?? null,
+        email: user.email ?? session.email ?? null,
         profileImageUrl: user.profileImageUrl ?? session.profileImageUrl ?? null,
       });
     }
@@ -33,6 +35,7 @@ export async function GET() {
     isLoggedIn: true,
     userId: session.userId ?? null,
     nickname: session.nickname ?? null,
+    email: session.email ?? null,
     profileImageUrl: session.profileImageUrl ?? null,
   });
 }
