@@ -1,77 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAlcoholsByCategory, useAlcoholSearch } from "@/hooks/useAlcohols";
+import type { components } from "@/types/api";
 
-const CATEGORIES = [
-  { key: "WHISKEY", emoji: "\u{1F943}", label: "\uC704\uC2A4\uD0A4" },
-  { key: "WINE", emoji: "\u{1F377}", label: "\uC640\uC778" },
-  { key: "BEER", emoji: "\u{1F37A}", label: "\uB9E5\uC8FC" },
-  { key: "SOJU", emoji: "\u{1FAD9}", label: "\uC18C\uC8FC" },
-  { key: "MAKGEOLLI", emoji: "\u{1F33E}", label: "\uB9C9\uAC78\uB9AC" },
-  { key: "SAKE", emoji: "\u{1F376}", label: "\uC0AC\uCF00" },
-  { key: "VODKA", emoji: "\u{1F942}", label: "\uBCF4\uB4DC\uCE74" },
-  { key: "GIN", emoji: "\u{1F378}", label: "\uC9C4" },
-  { key: "RUM", emoji: "\u{1F3F4}\u200D\u2620\uFE0F", label: "\uB7FC" },
-  { key: "TEQUILA", emoji: "\u{1F335}", label: "\uD14C\uD0AC\uB77C" },
-  { key: "BRANDY", emoji: "\u{1F943}", label: "\uBE0C\uB79C\uB514" },
-] as const;
+type AlcoholCategory = NonNullable<components["schemas"]["AlcoholResponse"]["category"]>;
 
-// 데모 데이터 (API 연결 전)
-const DEMO_RESULTS: Record<string, { nameKo: string; name: string; meta: string; emoji: string }[]> = {
-  WHISKEY: [
-    { nameKo: "\uB77C\uD504\uB85C\uC775 10\uB144", name: "Laphroaig 10 Year", meta: "\uC2A4\uCF54\uD2C0\uB79C\uB4DC \xB7 43%", emoji: "\u{1F943}" },
-    { nameKo: "\uB9E5\uCE98\uB780 12 \uC170\uB9AC", name: "Macallan 12 Sherry", meta: "\uC2A4\uCF54\uD2C0\uB79C\uB4DC \xB7 40%", emoji: "\u{1F943}" },
-    { nameKo: "\uC870\uB2C8\uC6CC\uCEE4 \uBE14\uB799\uB77C\uBCA8", name: "Johnnie Walker Black Label", meta: "\uC2A4\uCF54\uD2C0\uB79C\uB4DC \xB7 40%", emoji: "\u{1F943}" },
-    { nameKo: "\uBC1C\uBCA0\uB2C8 \uB354\uBE14\uC6B0\uB4DC 12", name: "Balvenie DoubleWood 12", meta: "\uC2A4\uCF54\uD2C0\uB79C\uB4DC \xB7 40%", emoji: "\u{1F943}" },
-    { nameKo: "\uAE00\uB80C\uD53C\uB515 15\uB144", name: "Glenfiddich 15", meta: "\uC2A4\uCF54\uD2C0\uB79C\uB4DC \xB7 40%", emoji: "\u{1F943}" },
-  ],
-  WINE: [
-    { nameKo: "\uC0E4\uD1A0 \uB9C8\uACE0 2018", name: "Ch\xE2teau Margaux 2018", meta: "\uBCF4\uB974\uB3C4 \xB7 \uD504\uB791\uC2A4", emoji: "\u{1F377}" },
-    { nameKo: "\uC81C\uBE0C\uB808 \uC0F4\uBCA0\uB974\uD0F1 2020", name: "Gevrey-Chambertin 2020", meta: "\uBD80\uB974\uACE0\uB274 \xB7 \uD504\uB791\uC2A4", emoji: "\u{1F377}" },
-  ],
-  BEER: [
-    { nameKo: "\uAD6C\uC2A4 \uC544\uC77C\uB79C\uB4DC IPA", name: "Goose Island IPA", meta: "\uBBF8\uAD6D \xB7 5.9%", emoji: "\u{1F37A}" },
-  ],
+const CATEGORIES: { key: AlcoholCategory; emoji: string; label: string }[] = [
+  { key: "WHISKEY", emoji: "🥃", label: "위스키" },
+  { key: "WINE", emoji: "🍷", label: "와인" },
+  { key: "BEER", emoji: "🍺", label: "맥주" },
+  { key: "SOJU", emoji: "🫙", label: "소주" },
+  { key: "MAKGEOLLI", emoji: "🌾", label: "막걸리" },
+  { key: "SAKE", emoji: "🍶", label: "사케" },
+  { key: "VODKA", emoji: "🫗", label: "보드카" },
+  { key: "GIN", emoji: "🍸", label: "진" },
+  { key: "RUM", emoji: "🏴‍☠️", label: "럼" },
+  { key: "TEQUILA", emoji: "🌵", label: "테킬라" },
+  { key: "BRANDY", emoji: "🥃", label: "브랜디" },
+  { key: "COCKTAIL", emoji: "🍹", label: "칵테일" },
+  { key: "ETC", emoji: "🍾", label: "기타" },
+];
+
+const CATEGORY_ICONS: Record<string, string> = {
+  WHISKEY: "🥃", WINE: "🍷", BEER: "🍺", SAKE: "🍶",
+  MAKGEOLLI: "🌾", SOJU: "🫙", GIN: "🍸", RUM: "🏴‍☠️",
+  VODKA: "🫗", TEQUILA: "🌵", BRANDY: "🥃", COCKTAIL: "🍹", ETC: "🍾",
 };
 
 type View = "categories" | "results";
 
 export default function ExplorePage() {
   const [view, setView] = useState<View>("categories");
-  const [selectedCat, setSelectedCat] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [selectedCat, setSelectedCat] = useState<AlcoholCategory | null>(null);
+  const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedKeyword(keyword), 500);
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
+  const isSearching = debouncedKeyword.length >= 1;
+
+  const searchQuery = useAlcoholSearch(debouncedKeyword, view === "results" ? selectedCat : null);
+  const categoryQuery = useAlcoholsByCategory(
+    isSearching ? null : (view === "results" ? selectedCat : null)
+  );
+
+  const activeQuery = isSearching ? searchQuery : categoryQuery;
+  const alcohols = activeQuery.data?.pages.flatMap((p) => p.content) ?? [];
+  const isLoading = activeQuery.isLoading;
+  const { fetchNextPage, hasNextPage, isFetchingNextPage } = activeQuery;
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting && hasNextPage) fetchNextPage(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
 
   const selectedCategory = CATEGORIES.find((c) => c.key === selectedCat);
-  const results = selectedCat ? DEMO_RESULTS[selectedCat] ?? [] : [];
 
-  // 검색어에 따른 간단한 자동완성 필터
-  const allAlcohols = Object.values(DEMO_RESULTS).flat();
-  const filtered = searchQuery.length > 0
-    ? allAlcohols.filter(
-        (a) =>
-          a.nameKo.includes(searchQuery) ||
-          a.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
-
-  const handleCategoryClick = (key: string) => {
+  const handleCategoryClick = (key: AlcoholCategory) => {
     setSelectedCat(key);
     setView("results");
+    setKeyword("");
+    setDebouncedKeyword("");
   };
+
+  const showResults = isSearching || view === "results";
 
   return (
     <>
-      {view === "categories" ? (
+      {!showResults ? (
         <>
-          {/* Header */}
           <header className="px-5 pb-3 pt-4">
             <h1 className="text-[22px] font-semibold tracking-[-0.03em] text-ink">
               탐색
             </h1>
           </header>
 
-          {/* Search */}
           <div className="relative shrink-0 px-4 pb-3">
             <div className="flex items-center gap-2.5 rounded-input border-[1.5px] border-beige-dark bg-white/70 px-3.5 py-2.5">
               <svg width={15} height={15} viewBox="0 0 15 15" fill="none">
@@ -79,37 +93,14 @@ export default function ExplorePage() {
                 <path d="M10.5 10.5L13.5 13.5" stroke="#9A8060" strokeWidth={1.4} strokeLinecap="round" />
               </svg>
               <input
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowAutocomplete(e.target.value.length > 0);
-                }}
-                onFocus={() => searchQuery.length > 0 && setShowAutocomplete(true)}
-                onBlur={() => setTimeout(() => setShowAutocomplete(false), 150)}
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
                 placeholder="술 이름을 검색해보세요"
                 className="flex-1 bg-transparent text-[14.5px] text-ink outline-none placeholder:text-ink-muted"
               />
             </div>
-
-            {/* Autocomplete */}
-            {showAutocomplete && filtered.length > 0 && (
-              <div className="absolute left-4 right-4 z-10 mt-1 overflow-hidden rounded-input border-[1.5px] border-beige-dark bg-white shadow-[0_4px_16px_rgba(30,18,8,0.08)]">
-                {filtered.slice(0, 5).map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex cursor-pointer items-center gap-2.5 border-b border-beige-mid px-3.5 py-3 last:border-b-0 active:bg-beige"
-                  >
-                    <div>
-                      <p className="text-[14.5px] font-medium text-ink">{item.name}</p>
-                      <p className="mt-0.5 text-[12px] text-ink-muted">{item.nameKo} · {item.meta}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* Category grid */}
           <div className="flex-1 overflow-y-auto pb-6">
             <p className="mb-3 px-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-muted">
               카테고리
@@ -130,12 +121,13 @@ export default function ExplorePage() {
         </>
       ) : (
         <>
-          {/* Category result header */}
           <div className="flex shrink-0 items-center gap-2.5 border-b border-beige-dark px-4 py-2.5">
             <button
               onClick={() => {
                 setView("categories");
                 setSelectedCat(null);
+                setKeyword("");
+                setDebouncedKeyword("");
               }}
               className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-white/70"
             >
@@ -143,32 +135,67 @@ export default function ExplorePage() {
                 <path d="M9.5 3.5L5.5 8L9.5 12.5" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <span className="text-[16px] font-semibold text-ink">
-              {selectedCategory?.emoji} {selectedCategory?.label}
-            </span>
-          </div>
-
-          {/* Results list */}
-          <div className="flex-1 overflow-y-auto">
-            {results.length === 0 ? (
-              <div className="py-20 text-center text-[14px] text-ink-muted">
-                등록된 술이 없습니다.
+            {isSearching ? (
+              <div className="flex flex-1 items-center gap-2 rounded-input border-[1.5px] border-beige-dark bg-white/70 px-3 py-1.5">
+                <svg width={14} height={14} viewBox="0 0 15 15" fill="none">
+                  <circle cx={6.5} cy={6.5} r={5} stroke="#9A8060" strokeWidth={1.4} />
+                  <path d="M10.5 10.5L13.5 13.5" stroke="#9A8060" strokeWidth={1.4} strokeLinecap="round" />
+                </svg>
+                <input
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  autoFocus
+                  className="flex-1 bg-transparent text-[14px] text-ink outline-none placeholder:text-ink-muted"
+                />
               </div>
             ) : (
-              results.map((item, idx) => (
+              <>
+                <div className="flex flex-1 items-center gap-2 rounded-input border-[1.5px] border-beige-dark bg-white/70 px-3 py-1.5"
+                  onClick={() => setKeyword(" ")}
+                >
+                  <svg width={14} height={14} viewBox="0 0 15 15" fill="none">
+                    <circle cx={6.5} cy={6.5} r={5} stroke="#9A8060" strokeWidth={1.4} />
+                    <path d="M10.5 10.5L13.5 13.5" stroke="#9A8060" strokeWidth={1.4} strokeLinecap="round" />
+                  </svg>
+                  <span className="text-[14px] text-ink-muted">술 이름을 검색해보세요</span>
+                </div>
+                <span className="text-[15px] font-semibold text-ink">
+                  {selectedCategory?.emoji} {selectedCategory?.label}
+                </span>
+              </>
+            )}
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            {isLoading ? (
+              <div className="py-20 text-center text-[14px] text-ink-muted">검색 중...</div>
+            ) : alcohols.length === 0 ? (
+              <div className="py-20 text-center text-[14px] text-ink-muted">
+                {isSearching ? "검색 결과가 없습니다." : "등록된 술이 없습니다."}
+              </div>
+            ) : (
+              alcohols.map((alc) => (
                 <div
-                  key={idx}
+                  key={alc.id}
                   className="flex cursor-pointer items-center gap-3.5 border-b border-beige-mid bg-white px-5 py-3.5 first:border-t first:border-beige-mid active:bg-beige"
                 >
                   <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[11px] bg-beige-mid text-[18px]">
-                    {item.emoji}
+                    {CATEGORY_ICONS[alc.category ?? "ETC"]}
                   </div>
                   <div className="flex-1">
-                    <p className="text-[14.5px] font-medium text-ink">{item.nameKo}</p>
-                    <p className="mt-0.5 text-[12px] text-ink-muted">{item.name} · {item.meta}</p>
+                    <p className="text-[14.5px] font-medium text-ink">{alc.name}</p>
+                    <p className="mt-0.5 text-[12px] text-ink-muted">
+                      {alc.nameKo ?? ""}
+                      {alc.nameKo && alc.categoryKo ? " · " : ""}
+                      {alc.categoryKo ?? ""}
+                    </p>
                   </div>
                 </div>
               ))
+            )}
+            <div ref={sentinelRef} className="h-1" />
+            {isFetchingNextPage && (
+              <div className="py-4 text-center text-[14px] text-ink-muted">불러오는 중...</div>
             )}
           </div>
         </>

@@ -26,9 +26,13 @@ export async function getAlcoholsByCategory(category: AlcoholCategory, cursor?: 
   return handleResponse(res);
 }
 
-export async function searchAlcohols(keyword: string, cursor?: string): Promise<PagedAlcoholResponse> {
+export async function searchAlcohols(keyword: string, cursor?: string, category?: AlcoholCategory): Promise<PagedAlcoholResponse> {
   const params = new URLSearchParams({ keyword });
   if (cursor) params.set("cursor", cursor);
   const res = await fetch(`/api/alcohols?${params}`);
-  return handleResponse(res);
+  const data = await handleResponse<PagedAlcoholResponse>(res);
+  if (category) {
+    return { ...data, content: data.content.filter((a) => a.category === category) };
+  }
+  return data;
 }
