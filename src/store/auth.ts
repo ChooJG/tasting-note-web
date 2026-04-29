@@ -5,12 +5,14 @@ interface AuthState {
   isLoggedIn: boolean;
   userId: number | null;
   nickname: string | null;
+  email: string | null;
   profileImageUrl: string | null;
   _hasHydrated: boolean;
   setAuth: (data: {
     isLoggedIn: boolean;
     userId?: number | null;
     nickname?: string | null;
+    email?: string | null;
     profileImageUrl?: string | null;
   }) => void;
   clearAuth: () => void;
@@ -22,17 +24,19 @@ export const useAuthStore = create<AuthState>()(
       isLoggedIn: false,
       userId: null,
       nickname: null,
+      email: null,
       profileImageUrl: null,
       _hasHydrated: false,
-      setAuth: ({ isLoggedIn, userId, nickname, profileImageUrl }) =>
+      setAuth: ({ isLoggedIn, userId, nickname, email, profileImageUrl }) =>
         set((prev) => ({
           isLoggedIn,
           userId: userId ?? prev.userId,
           nickname: nickname ?? prev.nickname,
+          email: email !== undefined ? email : prev.email,
           profileImageUrl: profileImageUrl !== undefined ? profileImageUrl : prev.profileImageUrl,
         })),
       clearAuth: () =>
-        set({ isLoggedIn: false, userId: null, nickname: null, profileImageUrl: null }),
+        set({ isLoggedIn: false, userId: null, nickname: null, email: null, profileImageUrl: null }),
     }),
     {
       name: "sip-auth",

@@ -10,7 +10,7 @@ import { uploadProfileImage } from "@/lib/uploadImage";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { nickname, profileImageUrl, isLoggedIn, _hasHydrated, setAuth, clearAuth } = useAuthStore();
+  const { nickname, email, profileImageUrl, isLoggedIn, _hasHydrated, setAuth, clearAuth } = useAuthStore();
 
   useEffect(() => {
     if (_hasHydrated && !isLoggedIn) {
@@ -81,6 +81,9 @@ export default function ProfilePage() {
         <p className="mt-1 text-[18px] font-semibold text-beige">
           {displayName}
         </p>
+        {email && (
+          <p className="mt-0.5 text-[12px] text-beige/50">{email}</p>
+        )}
 
         {/* Stats */}
         <div className="mt-1.5 flex">

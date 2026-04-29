@@ -7,6 +7,7 @@ export interface SessionData {
   userId?: number;
   nickname?: string;
   profileImageUrl?: string;
+  email?: string;
 }
 
 export function parseJwtPayload(token: string): Record<string, unknown> {
