@@ -187,15 +187,17 @@ export default function NoteForm({
   };
 
   const onFormSubmit = async (data: NoteFormInput) => {
-    if (photos.length === 0) {
+    const hasNewFiles = photos.some((p) => !!p.file);
+    const hasRemovedExisting = (existingImageUrls?.length ?? 0) > photos.filter((p) => p.isExisting).length;
+
+    if (!hasNewFiles && !hasRemovedExisting) {
       onSubmit(data, []);
       return;
     }
-    // 모든 사진을 File로 변환 (기존 URL은 프록시 경유, 새 파일은 그대로)
+
     const files: File[] = await Promise.all(
       photos.map(async (p, i) => {
         if (p.file) return p.file;
-        // 기존 이미지 URL → 프록시로 가져와서 File 변환
         const res = await fetch(`/api/proxy-image?url=${encodeURIComponent(p.preview)}`);
         const blob = await res.blob();
         const ext = blob.type.split("/")[1] ?? "jpg";
@@ -224,29 +226,38 @@ export default function NoteForm({
               </p>
               <p className="mt-0.5 truncate text-[12px] text-ink-muted">
                 {selectedAlcohol.name}
-                {selectedAlcohol.categoryKo ? ` \xB7 ${selectedAlcohol.categoryKo}` : ""}
+                {selectedAlcohol.categoryKo ? ` · ${selectedAlcohol.categoryKo}` : ""}
               </p>
             </div>
             <button type="button" onClick={onClearAlcohol} className="shrink-0 text-[16px] text-ink-muted">
               ✕
             </button>
           </div>
-        ) : (
-          <div className="flex gap-2">
-            <input
-              value={customAlcoholName}
-              onChange={(e) => onCustomAlcoholNameChange(e.target.value)}
-              placeholder="술 이름을 직접 입력"
-              className="flex-1 rounded-input border-[1.5px] border-beige-dark bg-white/65 px-3.5 py-3 text-[15px] font-light text-ink placeholder:text-ink-muted focus:border-wine-light focus:bg-white/90 focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={onSearchAlcohol}
-              className="shrink-0 rounded-input border-[1.5px] border-wine bg-wine-pale px-3.5 py-3 text-[13px] font-medium text-wine"
-            >
-              검색
+        ) : customAlcoholName.length > 0 ? (
+          <div className="flex items-center gap-3 rounded-input border-[1.5px] border-wine/30 bg-wine-pale p-3">
+            <div className="flex h-[38px] w-[38px] items-center justify-center rounded-[9px] bg-white/60 text-[17px]">
+              ✏️
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[14.5px] font-medium text-wine">{customAlcoholName}</p>
+              <p className="mt-0.5 text-[12px] text-wine/60">직접 입력</p>
+            </div>
+            <button type="button" onClick={onClearAlcohol} className="shrink-0 text-[16px] text-wine/50">
+              ✕
             </button>
           </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onSearchAlcohol}
+            className="flex w-full items-center gap-2.5 rounded-input border-[1.5px] border-beige-dark bg-white/70 px-3.5 py-3 text-left"
+          >
+            <svg width={15} height={15} viewBox="0 0 15 15" fill="none" className="shrink-0">
+              <circle cx={6.5} cy={6.5} r={5} stroke="#9A8060" strokeWidth={1.4} />
+              <path d="M10.5 10.5L13.5 13.5" stroke="#9A8060" strokeWidth={1.4} strokeLinecap="round" />
+            </svg>
+            <span className="text-[15px] text-ink-muted">술 이름으로 검색 또는 직접 입력…</span>
+          </button>
         )}
       </div>
 

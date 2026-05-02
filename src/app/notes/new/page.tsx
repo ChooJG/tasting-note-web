@@ -26,6 +26,7 @@ export default function NewNotePage() {
       router.replace("/login?callbackUrl=/notes/new");
     }
   }, [hasHydrated, isLoggedIn, router]);
+
   const [selectedAlcohol, setSelectedAlcohol] = useState<AlcoholResponse | null>(null);
   const [customAlcoholName, setCustomAlcoholName] = useState("");
   const queryClient = useQueryClient();
@@ -80,7 +81,6 @@ export default function NewNotePage() {
     toast("임시저장 되었습니다");
   };
 
-  // 술 검색 화면
   if (pickingAlcohol) {
     return (
       <AlcoholSearch
@@ -92,7 +92,6 @@ export default function NewNotePage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      {/* Header */}
       <header className="flex shrink-0 items-center border-b border-beige-dark px-5 pb-3 pt-4">
         <button
           onClick={() => window.location.replace("/feed")}
@@ -113,7 +112,6 @@ export default function NewNotePage() {
         </button>
       </header>
 
-      {/* Form */}
       <div className="flex-1 overflow-y-auto">
         <NoteForm
           selectedAlcohol={selectedAlcohol}
