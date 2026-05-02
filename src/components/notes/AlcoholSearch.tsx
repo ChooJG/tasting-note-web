@@ -43,7 +43,7 @@ export default function AlcoholSearch({ onSelect, onBack }: AlcoholSearchProps) 
   const [selectedCategory, setSelectedCategory] = useState<AlcoholCategory | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedKeyword(keyword), 300);
+    const timer = setTimeout(() => setDebouncedKeyword(keyword), 500);
     return () => clearTimeout(timer);
   }, [keyword]);
 

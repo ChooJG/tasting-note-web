@@ -18,10 +18,10 @@ export function useAlcoholsByCategory(category: AlcoholCategory | null) {
   });
 }
 
-export function useAlcoholSearch(keyword: string) {
+export function useAlcoholSearch(keyword: string, category?: AlcoholCategory | null) {
   return useInfiniteQuery({
-    queryKey: ["alcohols", "search", keyword],
-    queryFn: ({ pageParam }) => searchAlcohols(keyword, pageParam as string | undefined),
+    queryKey: ["alcohols", "search", keyword, category ?? null],
+    queryFn: ({ pageParam }) => searchAlcohols(keyword, pageParam as string | undefined, category ?? undefined),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.nextCursor : undefined,
     enabled: keyword.length >= 1,

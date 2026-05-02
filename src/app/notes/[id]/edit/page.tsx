@@ -126,11 +126,8 @@ export default function EditNotePage({
         <NoteForm
           selectedAlcohol={effectiveAlcohol}
           customAlcoholName={effectiveCustomName}
-          onCustomAlcoholNameChange={(name) => {
-            setCustomAlcoholName(name);
-            setSelectedAlcohol(null);
-          }}
           onSearchAlcohol={() => setPickingAlcohol(true)}
+          onCustomAlcoholNameChange={(name) => { setCustomAlcoholName(name); setSelectedAlcohol(null); }}
           onClearAlcohol={() => {
             setSelectedAlcohol(null);
             setCustomAlcoholName("");
